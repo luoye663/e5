@@ -13,11 +13,14 @@ import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.util.netRequest.OkHttpClientUtil;
 import io.qyi.e5.util.netRequest.OkHttpRequestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,9 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
 
     @Autowired
     IOutlookLogService outlookLogService;
+
+    @Value("${outlook.errorMsg}")
+    private String[] errorMsg;
 
 
     // 2020-03-2 10:38 这里需要进行查询判断数据库是否有内容再进行插入。
@@ -79,7 +85,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", github_id)
-                    .or().eq("client_id",client_id);
+                .or().eq("client_id", client_id);
         Outlook outlook1 = baseMapper.selectOne(queryWrapper);
 //      有数据
         if (outlook1 != null) {
@@ -118,10 +124,11 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             if (json.containsKey("error")) {
                 String code = json.getJSONObject("error").getString("code");
                 String message = json.getJSONObject("error").getString("message");
-                if (!("Access token has expired.".equals(message) || "Access token validation failure.".equals(message))) {
-                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:3", "0", json.getJSONObject("error").getString("message"));
+                if (!errorCheck(message)) {
+                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:3", "0", message);
                     return false;
                 }
+//                CompactToken validation failed with reason code: 80049228
 
                 logger.info("令牌过期!");
                 String token = refresh_token(outlook);
@@ -191,5 +198,24 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             outlookLogService.addLog(outlook.getGithubId(), e.getMessage(), "0", e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * 检查出现的错误是否能够刷新令牌
+     *
+     * @throws
+     * @title errorCheck
+     * @description
+     * @author 落叶随风
+     * @updateTime 2020/3/5 14:47
+     */
+    public boolean errorCheck(String msg) {
+        System.out.println(Arrays.toString(errorMsg));
+        for (String s : errorMsg) {
+            if (msg.indexOf(s) != -1) {
+                return true;
+            }
+        }
+        return false;
     }
 }
