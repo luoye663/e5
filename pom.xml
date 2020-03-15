@@ -143,22 +143,11 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-
-        <!--quartz 定时任务-->
+        <!--这个包同时包含了一些其它的包：spring-context、spring-tx、spring-web、spring-messaging、spring-retry、spring-amqp、amqp-client，如果想单纯一点，可以单独引入。-->
         <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz-jobs</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-        <!--因为quartz 需要有Spring context 所有引入mail包-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <!--<version>${version}</version>-->
         </dependency>
     </dependencies>
 
