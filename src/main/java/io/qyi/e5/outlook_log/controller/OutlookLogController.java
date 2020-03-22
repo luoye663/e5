@@ -2,13 +2,10 @@ package io.qyi.e5.outlook_log.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.entity.OutlookLog;
-import io.qyi.e5.outlook_log.mapper.OutlookLogMapper;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>

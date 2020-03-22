@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author 落叶
- * @since 2020-02-24
+ * @since 2020-03-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -42,6 +42,21 @@ public class Outlook implements Serializable {
     private String refreshToken;
 
     private String accessToken;
+
+    /**
+     * 刷新时间间隔
+     */
+    private Integer cronTime;
+
+    /**
+     * 随机时间开始
+     */
+    private Integer cronTimeRandomStart;
+
+    /**
+     * 随机时间结束
+     */
+    private Integer cronTimeRandomEnd;
 
 
 }

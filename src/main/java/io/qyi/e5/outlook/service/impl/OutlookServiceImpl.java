@@ -2,18 +2,15 @@ package io.qyi.e5.outlook.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.qyi.e5.github.entity.Github;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.util.netRequest.OkHttpClientUtil;
 import io.qyi.e5.util.netRequest.OkHttpRequestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +108,12 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     }
 
     @Override
+    public boolean saveRandomTime(int github_id, int cron_time, int cron_time_random_start, int cron_time_random_end) {
+
+        return false;
+    }
+
+    @Override
     public List<Outlook> findAll() {
         return baseMapper.selectList(null);
     }
@@ -159,6 +162,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         return s;
 
     }
+
 
     // 刷新令牌，同时更新数据库中的令牌
     public String refresh_token(Outlook outlook) {

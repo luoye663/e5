@@ -1,7 +1,7 @@
 package io.qyi.e5.outlook.mapper;
 
-import io.qyi.e5.outlook.entity.Outlook;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.qyi.e5.outlook.entity.Outlook;
 
 /**
  * <p>

@@ -21,15 +21,16 @@ import java.util.UUID;
 public class TestController {
     @Autowired
     RabbitTemplate rabbitTemplate;
+
     @GetMapping("/send")
-    public void aaa(){
+    public void aaa() {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
 
 
         rabbitTemplate.convertAndSend("delay", "delay", "ttt", message -> {
             MessageProperties messageProperties = message.getMessageProperties();
             // 设置这条消息的过期时间
-            messageProperties.setExpiration("10000");
+            messageProperties.setExpiration("5000");
             return message;
         }, correlationData);
     }

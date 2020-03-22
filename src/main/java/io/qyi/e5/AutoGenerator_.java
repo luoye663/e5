@@ -52,7 +52,7 @@ public class AutoGenerator_ {
         gc.setAuthor("落叶");
         gc.setOpen(false);
 //       是否覆盖
-        gc.setFileOverride(true);
+        gc.setFileOverride(false);
         // gc.setSwagger2(true); 实体属性 Swagger2 注解
         mpg.setGlobalConfig(gc);
 

@@ -44,6 +44,25 @@
     <button id="findLog" class="mdui-btn mdui-color-theme-accent mdui-ripple">查询日志</button>
 </div>
 
+<#--时间设置-->
+<div class="mdui-table-fluid table-container floats">
+    <div class="mdui-textfield">
+        <label class="mdui-textfield-label" style="font-weight: 500;">调用时间间隔</label>
+        <input id="client_secret" class="mdui-textfield-input" type="text" value="${cron_time!}"/>
+    </div>
+    <div class="mdui-textfield">
+        <label class="mdui-textfield-label" style="font-weight: 500;">随机时间范围</label>
+        <input id="client_secret" class="mdui-textfield-input" type="text"
+               value="${cron_time_random_start!}-${cron_time_random_end!}"/>
+    </div>
+    <ol>
+        <li>调用时间间隔，单位 秒。</li>
+        <li>随机时间范围格式，“10-30”，指的是 调用时间间隔+取范围中的一个值，进行调用。</li>
+        <li>调用时间间隔不得大于12小时，也就是‭43200秒‬</li>
+    </ol>
+    <button id="save_random_time" class="mdui-btn mdui-color-theme-accent mdui-ripple">保存</button>
+</div>
+
 </body>
 <script src="//www.mdui.org/source/dist/js/mdui.min.js"></script>
 <script type="text/javascript">
@@ -51,7 +70,7 @@
         //日志查询
         $("#findLog").click(function () {
             var url = "/outlookLog/findLog"
-            window.open(url,'_blank')
+            window.open(url, '_blank')
         })
         // 授权
         $("#authorization").click(function () {

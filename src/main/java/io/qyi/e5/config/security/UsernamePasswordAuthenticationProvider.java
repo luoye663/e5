@@ -79,7 +79,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         QueryWrapper<Github> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", userInfo.getGithub_id());
         Github github = githubMapper.selectOne(queryWrapper);
-//                未注册就进行注册
+//      未注册就进行注册
         if (github == null) {
             github = new Github();
             github.setAccessToken(accessToken)

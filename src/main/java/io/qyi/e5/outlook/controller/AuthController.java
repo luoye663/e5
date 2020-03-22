@@ -3,7 +3,6 @@ package io.qyi.e5.outlook.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.entity.Outlook;
-import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.util.EncryptUtil;
 import io.qyi.e5.util.redis.RedisUtil;
@@ -31,9 +30,6 @@ public class AuthController {
     RedisUtil redisUtil;
 
     @Autowired
-    OutlookMapper outlookMapper;
-
-    @Autowired
     IOutlookService outlookService;
 
     @Value("${redis.auth2.outlook}")
@@ -52,7 +48,7 @@ public class AuthController {
 //        这里不应该查询，在进行授权时因该把基础数据丢到redis
         QueryWrapper<Outlook> outlookQueryWrapper = new QueryWrapper<>();
         outlookQueryWrapper.eq("github_id", redisUtil.get(states + state));
-        Outlook outlook = outlookMapper.selectOne(outlookQueryWrapper);
+        Outlook outlook = outlookService.getOne(outlookQueryWrapper);
 //      删除redis中的此键
         redisUtil.del(states + state);
         if (outlook == null) {
@@ -77,7 +73,7 @@ public class AuthController {
         QueryWrapper<Outlook> outlookQueryWrapper = new QueryWrapper<>();
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         outlookQueryWrapper.eq("github_id", authentication.getGithub_id());
-        Outlook outlook = outlookMapper.selectOne(outlookQueryWrapper);
+        Outlook outlook = outlookService.getOne(outlookQueryWrapper);
 
         if (outlook != null) {
             // 生成随机uuid标识用户
