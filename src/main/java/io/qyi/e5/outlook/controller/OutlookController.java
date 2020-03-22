@@ -29,16 +29,16 @@ public class OutlookController {
     @PostMapping("/save")
     public Result save(@RequestParam String client_id, @RequestParam String client_secret) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.save(client_id, client_secret,authentication.getGithub_id())) {
+        if (outlookService.save(client_id, client_secret, authentication.getGithub_id())) {
             return ResultUtil.success();
         }
         return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);
     }
 
     @PostMapping("/saveRandomTime")
-    public Result saveRandomTime(@RequestParam int cronTime,@RequestParam int crondomTime) {
+    public Result saveRandomTime(@RequestParam int cronTime, @RequestParam int crondomTime) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.saveRandomTime(cronTime,0,0)) {
+        if (outlookService.saveRandomTime(authentication.getGithub_id(), cronTime, 0, 0)) {
             return ResultUtil.success();
         }
         return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);
