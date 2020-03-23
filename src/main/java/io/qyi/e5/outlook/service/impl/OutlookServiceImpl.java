@@ -109,7 +109,18 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
 
     @Override
     public boolean saveRandomTime(int github_id, int cron_time, int cron_time_random_start, int cron_time_random_end) {
-
+        if (github_id == 0) {
+            return false;
+        }
+        UpdateWrapper<Outlook> Wrapper = new UpdateWrapper<>();
+        Wrapper.eq("github_id", github_id);
+        Outlook outlook = new Outlook();
+        outlook.setCronTime(cron_time).setCronTimeRandomStart(cron_time_random_start).setCronTimeRandomEnd(cron_time_random_end);
+        int update = baseMapper.update(outlook, Wrapper);
+//      有数据
+        if (update > 0) {
+            return true;
+        }
         return false;
     }
 

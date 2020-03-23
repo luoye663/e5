@@ -46,7 +46,7 @@ public class WebController {
         if (one != null) {
             model.addAttribute("client_id", one.getClientId());
             model.addAttribute("client_secret", one.getClientSecret());
-            model.addAttribute("cron_time", one.getCronTime());
+            model.addAttribute("cron_time", one.getCronTime().toString());
             model.addAttribute("cron_time_random_start", one.getCronTimeRandomStart());
             model.addAttribute("cron_time_random_end", one.getCronTimeRandomEnd());
         } else {

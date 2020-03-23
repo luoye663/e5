@@ -36,9 +36,22 @@ public class OutlookController {
     }
 
     @PostMapping("/saveRandomTime")
-    public Result saveRandomTime(@RequestParam int cronTime, @RequestParam int crondomTime) {
+    public Result saveRandomTime(@RequestParam int cronTime, @RequestParam String crondomTime) {
+        String[] split = crondomTime.split("-");
+        if (split.length != 2) {
+            return ResultUtil.error(ResultEnum.INVALID_format);
+        }
+        int cron_time_random_start;
+        int cron_time_random_end;
+        try {
+             cron_time_random_start = Integer.valueOf(split[0]);
+             cron_time_random_end = Integer.valueOf(split[1]);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return ResultUtil.error(ResultEnum.INVALID_format);
+        }
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.saveRandomTime(authentication.getGithub_id(), cronTime, 0, 0)) {
+        if (outlookService.saveRandomTime(authentication.getGithub_id(), cronTime, cron_time_random_start, cron_time_random_end)) {
             return ResultUtil.success();
         }
         return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);

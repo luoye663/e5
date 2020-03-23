@@ -48,11 +48,11 @@
 <div class="mdui-table-fluid table-container floats">
     <div class="mdui-textfield">
         <label class="mdui-textfield-label" style="font-weight: 500;">调用时间间隔</label>
-        <input id="client_secret" class="mdui-textfield-input" type="text" value="${cron_time!}"/>
+        <input id="cron_time" class="mdui-textfield-input" type="number" value="${cron_time!}"/>
     </div>
     <div class="mdui-textfield">
         <label class="mdui-textfield-label" style="font-weight: 500;">随机时间范围</label>
-        <input id="client_secret" class="mdui-textfield-input" type="text"
+        <input id="cron_time_random" class="mdui-textfield-input" type="text"
                value="${cron_time_random_start!}-${cron_time_random_end!}"/>
     </div>
     <ol>
@@ -71,6 +71,32 @@
         $("#findLog").click(function () {
             var url = "/outlookLog/findLog"
             window.open(url, '_blank')
+        })
+        //保存随机时间
+        $("#save_random_time").click(function () {
+            var cron_time = $("#cron_time").val();
+            var cron_time_random = $("#cron_time_random").val();
+            if ((cron_time || cron_time_random) == "") {
+                alert("cron_time 或 cron_time_random 不能为空!")
+                return;
+            }
+            ;
+            $.post("/outlook/outlook/saveRandomTime", {
+                cronTime: cron_time,
+                crondomTime: cron_time_random
+            }, function (data, status) {
+                console.log(data);
+                if (status != "success") {
+                    alert("未知错误，请联系管理员!")
+                    return;
+                }
+                if (data.code == 0) {
+                    alert("保存成功!");
+                } else {
+                    alert("错误:  " + data.msg);
+                }
+
+            })
         })
         // 授权
         $("#authorization").click(function () {
@@ -98,7 +124,7 @@
                 if (data.code == 0) {
                     alert("保存成功!");
                 } else {
-                    alert("错误: + " + data.msg);
+                    alert("错误:  " + data.msg);
                 }
 
             })
