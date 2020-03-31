@@ -171,7 +171,6 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         String s = OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages?$select=sender,subject", head, null);
         logger.info("请求邮件列表返回数据：" + s);
         return s;
-
     }
 
 

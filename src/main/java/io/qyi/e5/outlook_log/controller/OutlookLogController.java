@@ -2,6 +2,7 @@ package io.qyi.e5.outlook_log.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.gson.Gson;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -45,24 +47,16 @@ public class OutlookLogController {
     private int pageSize;
 
     @GetMapping("/findLog")
+    @ResponseBody
     public String findLog(Model model){
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         int github_id = authentication.getGithub_id();
-        /*QueryWrapper<OutlookLog> wrapper = new QueryWrapper();
-        wrapper.eq("github_id", github_id);
-        Page<OutlookLog> page = new Page<>(8,pageSize);
-
-        IPage<Map<String, Object>> mapIPage = outlookLogMapper.selectMapsPage(page, wrapper);
-        System.out.println("总页数"+mapIPage.getPages());
-        System.out.println("总记录数"+mapIPage.getTotal());
-        List<Map<String, Object>> records = mapIPage.getRecords();
-        records.forEach(System.out::println);*/
 
         QueryWrapper<OutlookLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", github_id);
         List<OutlookLog> list = outlookLogService.list(queryWrapper);
-        model.addAttribute("list_log", list);
-        return "/outlookLog/findLog";
+        Gson gson = new Gson();
+        return gson.toJson(list);
     }
 
     @GetMapping("/exec111111")
