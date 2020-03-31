@@ -1,6 +1,6 @@
 # e5
 e5续订
-用到技术
+用到框架
 spring boot
 <br>
 rabbitMq
