@@ -1,16 +1,9 @@
 package io.qyi.e5.controller.auth2;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import io.qyi.e5.bean.result.Result;
-import io.qyi.e5.bean.result.ResultEnum;
-import io.qyi.e5.github.entity.Github;
-import io.qyi.e5.github.entity.UserInfo;
 import io.qyi.e5.github.mapper.GithubMapper;
-import io.qyi.e5.service.github.GithubService;
+import io.qyi.e5.github.service.IGithubService;
 import io.qyi.e5.user.mapper.UserMapper;
 import io.qyi.e5.util.EncryptUtil;
-import io.qyi.e5.util.ResultUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,13 +26,7 @@ public class Auth {
     RedisUtil redisUtil;
 
     @Autowired
-    GithubService githubService;
-
-    @Autowired
-    UserMapper userMapper;
-
-    @Autowired
-    GithubMapper githubMapper;
+    IGithubService githubService;
 
     @Value("${redis.auth2.github}")
     String states;

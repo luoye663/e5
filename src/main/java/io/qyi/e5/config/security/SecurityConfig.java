@@ -1,5 +1,6 @@
 package io.qyi.e5.config.security;
 
+import io.qyi.e5.config.security.filter.LinkTokenAuthenticationFilter;
 import io.qyi.e5.service.security.SecurityUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -7,8 +8,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @program: msgpush
@@ -28,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UsernamePasswordAuthenticationConfig usernamePasswordAuthenticationConfig;
+
 
 
     @Override
@@ -57,28 +59,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("logout")
                 .logoutSuccessHandler( securityAuthenticationHandler);*/
+        http.addFilterBefore(new LinkTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.csrf().disable()
                 .apply(usernamePasswordAuthenticationConfig);
-
+        /*关闭创建session*/
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.formLogin()
                 .loginPage("/user/login")// 登陆页面
                 .loginProcessingUrl("/user/loginFrom")// 登陆表单提交请求
                 .and()
                 .authorizeRequests().antMatchers("/user/login", "/user/loginFrom", "/auth2/getGithubUrl").permitAll()// 指定相应的请求 不需要验证
-                .and()
-                .authorizeRequests().antMatchers("/quartz/**").permitAll()//测试
+//                .and()
+//                .authorizeRequests().antMatchers("/quartz/**").permitAll()//测试
                 .anyRequest()// 任何请求
                 .authenticated();// 都需要身份认证
-
 //        http.exceptionHandling().accessDeniedHandler();
 //        http.formLogin().loginProcessingUrl("api/getInfo");
 
 //        http.formLogin().usernameParameter("username");
 //        http.formLogin().passwordParameter("password");
 
-
     }
 
+    /*@Bean
+    public LinkTokenAuthenticationFilter linkTokenAuthenticationFilter (){
+        return new LinkTokenAuthenticationFilter();
+    }*/
 
     /*@Bean
     public AccessDeniedHandler getAccessDeniedHandler() {
@@ -91,4 +97,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         String antPatterns = "/pdfjs-2.1.266/**,/favicon.ico,/css/**,/js/**,/ico/**,/images/**,/jquery-1.12.4/**,/uuid-1.4/**,/layui-2.4.5/**,/jquery-easyui-1.6.11/**,/zTree-3.5.33/**,/select2-4.0.5/**,/greensock-js-1.20.5/**";
         web.ignoring().antMatchers(antPatterns.split(","));
     }*/
+
 }

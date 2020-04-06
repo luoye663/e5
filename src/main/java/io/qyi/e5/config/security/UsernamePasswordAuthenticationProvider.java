@@ -1,12 +1,10 @@
 package io.qyi.e5.config.security;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.qyi.e5.bean.result.ResultEnum;
 import io.qyi.e5.github.entity.Github;
 import io.qyi.e5.github.entity.UserInfo;
-import io.qyi.e5.github.mapper.GithubMapper;
-import io.qyi.e5.service.github.GithubService;
-import io.qyi.e5.util.ResultUtil;
+import io.qyi.e5.github.service.IGithubService;
+import io.qyi.e5.util.EncryptUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @program: e5
@@ -34,17 +35,19 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     @Value("${redis.auth2.github}")
     String states;
 
+    @Value("${redis.user.token}")
+    String token_;
+
     @Value("${isdebug}")
     boolean isDebug;
 
     @Autowired
     RedisUtil redisUtil;
 
-    @Autowired
-    GithubMapper githubMapper;
+
 
     @Autowired
-    GithubService githubService;
+    IGithubService githubService;
 
     //   验证
     @Override
@@ -55,10 +58,17 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         String code = authenticationToken.getCode();
         String state = authenticationToken.getState();
         logger.info("Github 认证: code：{} state：{} Token：", code, state);
+        Map<String, Object> userInfo_redis = new HashMap<>();
+        /*是否调试模式*/
         if (isDebug) {
+            String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
             UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken("debugName",
-                    "DebugAvatar",19658189, AuthorityUtils.createAuthorityList("user"));
+                    "DebugAvatar", 19658189,token, AuthorityUtils.createAuthorityList("user"));
             authenticationToken1.setDetails(authenticationToken);
+            userInfo_redis.put("github_name", "debug");
+            userInfo_redis.put("github_id", 19658189);
+            userInfo_redis.put("avatar_url", "https://www.baidu.com");
+            redisUtil.hmset(token_ + token, userInfo_redis, 3600);
             return authenticationToken1;
         }
         if (!redisUtil.hasKey(states + state)) {
@@ -78,7 +88,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         }
         QueryWrapper<Github> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", userInfo.getGithub_id());
-        Github github = githubMapper.selectOne(queryWrapper);
+        Github github = githubService.selectOne(queryWrapper);
 //      未注册就进行注册
         if (github == null) {
             github = new Github();
@@ -87,17 +97,24 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
                     .setGithubId(userInfo.getGithub_id())
                     .setName(userInfo.getName())
                     .setLogin(userInfo.getLogin());
-            githubMapper.insert(github);
+            githubService.insert(github);
         } else {
-//                    已注册就进行更新 AccessToken
+//          已注册就进行更新 AccessToken
             github.setAccessToken(accessToken);
-            githubMapper.update(github, queryWrapper);
+            githubService.update(github, queryWrapper);
         }
 
+        String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
+
+        /*写token信息到redis*/
+        userInfo_redis.put("github_name", github.getName());
+        userInfo_redis.put("github_id", github.getGithubId());
+        userInfo_redis.put("avatar_url", github.getAvatarUrl());
+        redisUtil.hmset(token_ + token, userInfo_redis, 3600);
 
 //       创建一个已认证的token
         UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(github.getName(),
-                github.getAvatarUrl(),github.getGithubId(), AuthorityUtils.createAuthorityList("user"));
+                github.getAvatarUrl(), github.getGithubId(), token, AuthorityUtils.createAuthorityList("user"));
 
 //      设置一些详细信息
         authenticationToken1.setDetails(authenticationToken);
