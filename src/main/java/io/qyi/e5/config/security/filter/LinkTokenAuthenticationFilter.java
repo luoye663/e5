@@ -1,17 +1,14 @@
 package io.qyi.e5.config.security.filter;
 
 import com.google.gson.Gson;
-import io.qyi.e5.bean.result.Result;
-import io.qyi.e5.bean.result.ResultEnum;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
-import io.qyi.e5.util.ResultUtil;
 import io.qyi.e5.util.SpringUtil;
 import io.qyi.e5.util.redis.RedisUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -49,6 +46,13 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         System.out.println("--------------Token鉴权---------------");
+        /*设置跨域*/
+        HttpServletResponse response = httpServletResponse;
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, PUT");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 

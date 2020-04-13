@@ -34,7 +34,6 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
 
     public LoginAuthenticationFilter() {
         super(new AntPathRequestMatcher("/auth2/receive", "GET"));
-
     }
 
 
