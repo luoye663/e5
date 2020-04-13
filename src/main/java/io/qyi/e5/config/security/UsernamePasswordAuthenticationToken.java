@@ -41,7 +41,7 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
         super(null);
         this.code = code;
         super.setAuthenticated(false);
-        logger.info("MobileLoginAuthenticationToken setAuthenticated ->false loading ...");
+        logger.info("创建未认证的用户名密码认证对象1 setAuthenticated ->false loading ...");
     }
 
     //    创建未认证的用户名密码认证对象
@@ -50,7 +50,7 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
         this.code = code;
         this.state = state;
         super.setAuthenticated(false);
-        logger.info("MobileLoginAuthenticationToken setAuthenticated ->false loading ...");
+        logger.info("创建未认证的用户名密码认证对象2 setAuthenticated ->false loading ...");
     }
 
 

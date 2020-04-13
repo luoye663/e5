@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.util.SpringUtil;
 import io.qyi.e5.util.redis.RedisUtil;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -50,10 +52,16 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
         HttpServletResponse response = httpServletResponse;
         response.setHeader("Access-Control-Allow-Origin","*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, PUT");
+        response.setHeader("Access-Control-Allow-Methods", "\"GET, HEAD, POST");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
+        /*如果是OPTIONS则结束请求*/
+        if (HttpMethod.OPTIONS.toString().equals(httpServletRequest.getMethod())) {
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        } else {
+            filterChain.doFilter(httpServletRequest, response);
+        }
+
     }
 
     public void sendJson(HttpServletResponse httpServletResponse, Object o) throws IOException {
