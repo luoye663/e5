@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class OutlookLogServiceImpl extends ServiceImpl<OutlookLogMapper, OutlookLog> implements IOutlookLogService {
     @Override
-    public void addLog(int githubId, String msg, String result,String original_msg) {
+    public void addLog(int githubId, String msg, int result,String original_msg) {
         OutlookLog outlookLog = new OutlookLog();
         outlookLog.setGithubId(githubId)
-                .setResult(result.equals("1") ? "1" : "0")
-                .setCallTime(String.valueOf(System.currentTimeMillis() / 1000))
+                .setResult(result)
+                .setCallTime((int) (System.currentTimeMillis() / 1000))
                 .setMsg(msg)
                 .setOriginalMsg(original_msg);
 

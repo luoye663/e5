@@ -45,30 +45,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         System.out.println("HttpSecurity http");
-        /*http.authorizeRequests().antMatchers("/").permitAll();
-        http.authorizeRequests().anyRequest().authenticated();
-        http.logout().permitAll();
-        http.formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login1")
-                .successHandler(securityAuthenticationHandler)
-                .failureHandler(securityAuthenticationHandler)
-//                .loginProcessingUrl("api/getInfo")
-                .permitAll()
-                .and()
-                .logout()
-                .logoutUrl("logout")
-                .logoutSuccessHandler( securityAuthenticationHandler);*/
         http.addFilterBefore(new LinkTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.csrf().disable()
                 .apply(usernamePasswordAuthenticationConfig);
         /*关闭创建session*/
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.formLogin()
+        /*formLogin()
                 .loginPage("/user/login")// 登陆页面
                 .loginProcessingUrl("/user/loginFrom")// 登陆表单提交请求
-                .and()
-                .authorizeRequests().antMatchers("/user/login", "/user/loginFrom", "/auth2/getGithubUrl").permitAll()// 指定相应的请求 不需要验证
+                .and()*/
+        http.authorizeRequests().antMatchers("/user/login", "/user/loginFrom", "/auth2/getGithubUrl").permitAll()// 指定相应的请求 不需要验证
 //                .and()
 //                .authorizeRequests().antMatchers("/quartz/**").permitAll()//测试
                 .anyRequest()// 任何请求

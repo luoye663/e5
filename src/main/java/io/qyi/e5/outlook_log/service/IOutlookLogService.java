@@ -12,6 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-03-03
  */
 public interface IOutlookLogService extends IService<OutlookLog> {
-    void addLog(int githubId, String msg,String result,String original_msg);
+    void addLog(int githubId, String msg,int result,String original_msg);
 
 }

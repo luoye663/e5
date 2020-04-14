@@ -139,7 +139,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
                 String code = json.getJSONObject("error").getString("code");
                 String message = json.getJSONObject("error").getString("message");
                 if (!errorCheck(message)) {
-                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:3", "0", message);
+                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:3", 0, message);
                     return false;
                 }
 //                CompactToken validation failed with reason code: 80049228
@@ -152,11 +152,11 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
                 s = MailList(token);
                 json = JSON.parseObject(s);
                 if (json.containsKey("error")) {
-                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:2", "0", json.getJSONObject("error").getString("message"));
+                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:2", 1, json.getJSONObject("error").getString("message"));
                     return false;
                 }
             }
-            outlookLogService.addLog(outlook.getGithubId(), "ok", "1", "");
+            outlookLogService.addLog(outlook.getGithubId(), "ok", 1, "");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -191,7 +191,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             JSONObject jsonObject = JSON.parseObject(s);
             if (!jsonObject.containsKey("access_token")) {
                 logger.info("返回的access_token字段不存在");
-                outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌! 需要重新授权!", "0", s);
+                outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌! 需要重新授权!", 0, s);
 //              字段不存在
                 return null;
             }
@@ -202,14 +202,14 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             queryWrapper.eq("client_id", outlook.getClientId());
             if (baseMapper.update(outlook, queryWrapper) != 1) {
                 logger.info("返更新行数不为1");
-                outlookLogService.addLog(outlook.getGithubId(), "更新数据库时发现有重复的key", "0", "");
+                outlookLogService.addLog(outlook.getGithubId(), "更新数据库时发现有重复的key", 0, "");
                 return null;
             }
             return outlook.getAccessToken();
 //            更新数据库
         } catch (Exception e) {
             e.printStackTrace();
-            outlookLogService.addLog(outlook.getGithubId(), e.getMessage(), "0", e.getMessage());
+            outlookLogService.addLog(outlook.getGithubId(), e.getMessage(), 0, e.getMessage());
             return null;
         }
     }

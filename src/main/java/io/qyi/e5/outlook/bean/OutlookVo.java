@@ -12,4 +12,6 @@ import lombok.Data;
 public class OutlookVo {
     private String clientId;
     private String clientSecret;
+    private int cronTimeRandomStart;
+    private int cronTimeRandomEnd;
 }

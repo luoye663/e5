@@ -33,12 +33,12 @@ public class OutlookLog implements Serializable {
     /**
      * 调用时间
      */
-    private String callTime;
+    private Integer callTime;
 
     /**
      * 调用结果
      */
-    private String result;
+    private Integer result;
 
     /**
      * 如果有错误原因则记录
