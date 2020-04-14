@@ -19,7 +19,8 @@ public enum ResultEnum {
     NO_ROBOT_FOUND_(-10007,"No QQ robot corresponding to this token was found"),
     STATE_HAS_EXPIRED(-10008,"state has expired, please re-authorize."),
     INVALID_EMAIL(-10009,"Invalid Email!"),
-    INVALID_format(-10010, "Invalid format");
+    INVALID_format(-10010, "Invalid format"),
+    NO_DATA_FOUND(-10011,"No data found");
     private Integer code;
     private String msg;
 
