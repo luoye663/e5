@@ -34,6 +34,7 @@ public class SecurityAuthenticationHandler implements AuthenticationSuccessHandl
         PrintWriter writer = httpServletResponse.getWriter();
         Map<String, String> token = new HashMap<>();
         token.put("token", at.getToken());
+        token.put("username", at.getName());
         writer.write(gson.toJson(ResultUtil.success(token)) );
         writer.flush();
     }

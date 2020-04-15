@@ -164,12 +164,27 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
     }
 
+    /**
+     * 读取邮件内容
+    * @Description:
+    * @param: count 读取数量，0 则读取当前页所有
+    * @return: void
+    * @Author: 落叶随风
+    * @Date: 2020/4/15
+    */
+    public void getMailBody(int count,String MailBody ,String access_token) throws Exception {
+        Map<String, Object> head = new HashMap<>();
+        head.put("Content-Type", "application/json");
+        head.put("Authorization", access_token);
+        String s = OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages/", head, null);
+    }
+
     public String MailList(String access_token) throws Exception {
         Map<String, Object> head = new HashMap<>();
         head.put("Content-Type", "application/json");
         head.put("Authorization", access_token);
         String s = OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages?$select=sender,subject", head, null);
-        logger.info("请求邮件列表返回数据：" + s);
+        logger.debug("请求邮件列表返回数据：" + s);
         return s;
     }
 

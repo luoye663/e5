@@ -1,9 +1,11 @@
 package io.qyi.e5.controller.auth2;
 
+import io.qyi.e5.bean.result.Result;
 import io.qyi.e5.github.mapper.GithubMapper;
 import io.qyi.e5.github.service.IGithubService;
 import io.qyi.e5.user.mapper.UserMapper;
 import io.qyi.e5.util.EncryptUtil;
+import io.qyi.e5.util.ResultUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,11 +38,10 @@ public class Auth {
 
 
     @RequestMapping("/getGithubUrl")
-    public void getGithubUrl(HttpServletResponse response) {
+    public Result getGithubUrl() {
         String state = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
         redisUtil.set(states + state, true, 600);
-        response.setStatus(302);
-        response.setHeader("Location", "https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=https://e5.qyi.io/auth2/receive&state=" + state);
+        return ResultUtil.success("https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=https://e5.qyi.io/auth2/receive&state=" + state);
     }
 
    /* @RequestMapping("/receive")

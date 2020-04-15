@@ -48,8 +48,8 @@ public class OutlookController {
         int cron_time_random_start;
         int cron_time_random_end;
         try {
-             cron_time_random_start = Integer.valueOf(split[0]);
-             cron_time_random_end = Integer.valueOf(split[1]);
+            cron_time_random_start = Integer.valueOf(split[0]);
+            cron_time_random_end = Integer.valueOf(split[1]);
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return ResultUtil.error(ResultEnum.INVALID_format);
@@ -60,17 +60,17 @@ public class OutlookController {
         }
         return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);
     }
+
     @GetMapping("/getOutlookInfo")
-    public Result getOutlookInfo(){
+    public Result getOutlookInfo() {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         int github_id = authentication.getGithub_id();
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", github_id);
         Outlook one = outlookService.getOne(queryWrapper);
         OutlookVo vo = new OutlookVo();
-        System.out.println(one);
         if (one != null) {
-            BeanUtils.copyProperties(one,vo);
+            BeanUtils.copyProperties(one, vo);
         }
         return ResultUtil.success(vo);
     }

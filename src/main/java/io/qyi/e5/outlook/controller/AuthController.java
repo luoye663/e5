@@ -60,7 +60,7 @@ public class AuthController {
         boolean authorization_code = outlookService.getTokenAndSave(code, outlook.getClientId(), outlook.getClientSecret(), "https://e5.qyi.io/outlook/auth2/receive"
                 , "authorization_code");
         if (!authorization_code) {
-            return ResultUtil.error(-3, "未知错误，请联系管理员~");
+            return ResultUtil.error(-3, "clientId 或 clientSecret 填写错误!授权失败!");
         }
         return ResultUtil.success();
     }
