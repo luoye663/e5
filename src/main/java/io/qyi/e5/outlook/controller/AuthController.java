@@ -45,7 +45,7 @@ public class AuthController {
     @RequestMapping("/receive")
     public Result Receive(String code, String state, String session_state) throws Exception {
         if (!redisUtil.hasKey(states + state)) {
-            return ResultUtil.error(-1, "state已过期，重新点击授权!");
+            return ResultUtil.error(-1, "state已过期，请到用户中心重新授权!");
         }
         /*这里不应该查询，在进行授权时因该把基础数据丢到redis*/
         QueryWrapper<Outlook> outlookQueryWrapper = new QueryWrapper<>();
