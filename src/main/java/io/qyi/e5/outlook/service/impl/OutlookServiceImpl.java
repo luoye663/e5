@@ -5,6 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
@@ -134,21 +137,22 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         try {
             String s = MailList(outlook.getAccessToken());
             JSONObject json = JSON.parseObject(s);
-//            报错
+            /*错误情况，一般是令牌过期*/
             if (json.containsKey("error")) {
                 String code = json.getJSONObject("error").getString("code");
                 String message = json.getJSONObject("error").getString("message");
+                /*如果出现得错误是没有message中收集的，那么就认为是无法刷新的情况。比如 用户取消了授权、删除了key*/
                 if (!errorCheck(message)) {
                     outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:3", 0, message);
                     return false;
                 }
-//                CompactToken validation failed with reason code: 80049228
-
                 logger.info("令牌过期!");
+                /*刷新令牌*/
                 String token = refresh_token(outlook);
                 if (token == null) {
                     return false;
                 }
+                /*再次获取邮件列表*/
                 s = MailList(token);
                 json = JSON.parseObject(s);
                 if (json.containsKey("error")) {
@@ -156,7 +160,10 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
                     return false;
                 }
             }
-            outlookLogService.addLog(outlook.getGithubId(), "ok", 1, "");
+            logger.info("邮件列表请求成功!" + s);
+            int mail_count = getMailBody(5, s, outlook.getAccessToken());
+            logger.info("读取邮件数量: {}" , mail_count);
+            outlookLogService.addLog(outlook.getGithubId(), "ok", 1, "读取邮件数量:" + mail_count);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,17 +173,35 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
 
     /**
      * 读取邮件内容
-    * @Description:
-    * @param: count 读取数量，0 则读取当前页所有
-    * @return: void
-    * @Author: 落叶随风
-    * @Date: 2020/4/15
-    */
-    public void getMailBody(int count,String MailBody ,String access_token) throws Exception {
-        Map<String, Object> head = new HashMap<>();
-        head.put("Content-Type", "application/json");
-        head.put("Authorization", access_token);
-        String s = OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages/", head, null);
+     *
+     * @Description:
+     * @param: count 读取数量，0 则读取当前页所有
+     * @return: void
+     * @Author: 落叶随风
+     * @Date: 2020/4/15
+     */
+    public int getMailBody(int count, String MailBody, String access_token) throws Exception {
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(MailBody, JsonObject.class);
+        int mial_list_count = jsonObject.get("value").getAsJsonArray().size();
+        if (mial_list_count < 1) {
+            return 0;
+        }
+        if (mial_list_count < count) {
+            count = jsonObject.get("value").getAsJsonArray().size();
+        }
+        JsonArray value = jsonObject.get("value").getAsJsonArray();
+        for (int i = 0; i < count - 1; i++) {
+            JsonObject mail = value.get(i).getAsJsonObject();
+            String id = mail.get("id").getAsString();
+
+            Map<String, Object> head = new HashMap<>();
+            head.put("Content-Type", "application/json");
+            head.put("Authorization", access_token);
+            /*不用管邮件内容*/
+            OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages/" + id, head, null);
+        }
+        return count;
     }
 
     public String MailList(String access_token) throws Exception {

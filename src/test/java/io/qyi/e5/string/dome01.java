@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * @program: e5
@@ -36,5 +37,11 @@ public class dome01 {
             JsonObject JsonObject = data.get(i).getAsJsonObject();
             JsonObject.get("pid").getAsInt();
         }
+    }
+
+    @Test
+    public void r(){
+        Random r=new Random();
+        System.out.println(r.nextInt(200-100+1)+100);
     }
 }

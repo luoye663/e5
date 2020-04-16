@@ -2,10 +2,12 @@ package io.qyi.e5.service.rabbitMQ.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
+import io.qyi.e5.service.task.ITask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -29,19 +31,26 @@ public class ListenerImpl {
 
     @Autowired
     IOutlookService outlookService;
+    @Autowired
+    ITask Task;
 
     @RabbitHandler
     @RabbitListener(queues = "delay_queue2", containerFactory = "rabbitListenerContainerFactory")
     public void listen(Message message, Channel channel) throws IOException {
-        String body = new String(message.getBody());
-        logger.info("消费者1开始处理消息： {},时间戳:{}" ,body,System.currentTimeMillis());
+        logger.info("消费者1开始处理消息： {},时间戳:{}" ,message,System.currentTimeMillis());
+        int github_id = Integer.valueOf(new String(message.getBody()));
         try {
-            Gson gson = new Gson();
-            Outlook outlook = gson.fromJson(body, Outlook.class);
-            outlookService.getMailList(outlook);
+            Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
+            if (Outlook == null) {
+                logger.warn("未找到此用户,github_id: {}",github_id);
+                return;
+            }
+            outlookService.getMailList(Outlook);
         } catch (Exception e) {
             e.printStackTrace();
         }
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+        /*再次进行添加任务*/
+        Task.sendTaskOutlookMQ(github_id);
     }
 }

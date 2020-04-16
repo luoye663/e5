@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
+import io.qyi.e5.service.task.ITask;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,16 +30,11 @@ public class TestController {
     @Autowired
     IOutlookService outlookService;
 
+    @Autowired
+    ITask Task;
+
     @GetMapping("/send")
     public void aaa() {
-        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
-        Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", 19658189));
-
-        rabbitTemplate.convertAndSend("delay", "delay", Outlook, message -> {
-            MessageProperties messageProperties = message.getMessageProperties();
-            // 设置这条消息的过期时间
-            messageProperties.setExpiration("5000");
-            return message;
-        }, correlationData);
+        Task.sendTaskOutlookMQ(19658189);
     }
 }
