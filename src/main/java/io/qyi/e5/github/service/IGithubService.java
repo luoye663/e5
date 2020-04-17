@@ -23,4 +23,6 @@ public interface IGithubService extends IService<Github> {
     Github selectOne(QueryWrapper<Github> queryWrapper);
 
     void insert(Github github);
+
+    int deleteInfo(int github_id);
 }

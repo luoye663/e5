@@ -132,6 +132,21 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         return baseMapper.selectList(null);
     }
 
+    /**
+     * 删除用户outlook
+    * @Description:
+    * @param: * @param github_id
+    * @return: int
+    * @Author: 落叶随风
+    * @Date: 2020/4/17
+    */
+    @Override
+    public int deleteInfo(int github_id) {
+        QueryWrapper<Outlook> outlookQueryWrapper = new QueryWrapper<>();
+        outlookQueryWrapper.eq("github_id", github_id);
+        return baseMapper.delete(outlookQueryWrapper);
+    }
+
     @Override
     public boolean getMailList(Outlook outlook) {
         try {

@@ -3,6 +3,7 @@ package io.qyi.e5.github.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.qyi.e5.github.entity.Github;
 import io.qyi.e5.github.entity.UserInfo;
@@ -102,5 +103,20 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
     @Override
     public void insert(Github github) {
         baseMapper.insert(github);
+    }
+
+    /**
+     * 删除此用户
+    * @Description:
+    * @param: * @param
+    * @return: void
+    * @Author: 落叶随风
+    * @Date: 2020/4/17
+    */
+    @Override
+    public int deleteInfo(int github_id) {
+        QueryWrapper<Github> githubQueryWrapper = new QueryWrapper<>();
+        githubQueryWrapper.eq("github_id", github_id);
+        return baseMapper.delete(githubQueryWrapper);
     }
 }

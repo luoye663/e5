@@ -36,14 +36,13 @@ public class TaskImpl implements ITask {
     @Override
     @Async
     public void sendTaskOutlookMQ(int github_id) {
-        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
         Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
         if (Outlook == null) {
             logger.warn("未找到此用户,github_id: {}",github_id);
             return;
         }
         /*根据用户设置生成随机数*/
-        String Expiration = getRandom( Outlook.getCronTimeRandomEnd(),Outlook.getCronTimeRandomEnd());
+        String Expiration = getRandom( Outlook.getCronTimeRandomStart(),Outlook.getCronTimeRandomEnd());
         send(github_id,Expiration);
 
     }
@@ -56,7 +55,7 @@ public class TaskImpl implements ITask {
         while (iterator.hasNext()) {
             Outlook next = iterator.next();
             /*根据用户设置生成随机数*/
-            String Expiration = getRandom( next.getCronTimeRandomEnd(),next.getCronTimeRandomEnd());
+            String Expiration = getRandom( next.getCronTimeRandomStart(),next.getCronTimeRandomEnd());
             send(next.getGithubId(), Expiration);
         }
     }
@@ -92,7 +91,7 @@ public class TaskImpl implements ITask {
     */
     public String getRandom(int start, int end){
         Random r = new Random();
-        String Expiration = String.valueOf((r.nextInt(end - start + 1) + end) * 1000);
+        String Expiration = String.valueOf((r.nextInt(end - start + 1) + start) * 1000);
         return Expiration;
     }
 }

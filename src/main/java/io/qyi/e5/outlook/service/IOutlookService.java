@@ -25,4 +25,5 @@ public interface IOutlookService extends IService<Outlook> {
 
     List<Outlook> findAll();
 
+    int deleteInfo(int github_id);
 }

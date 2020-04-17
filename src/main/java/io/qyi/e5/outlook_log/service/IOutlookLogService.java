@@ -13,5 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IOutlookLogService extends IService<OutlookLog> {
     void addLog(int githubId, String msg,int result,String original_msg);
-
+    int deleteInfo(int github_id);
 }

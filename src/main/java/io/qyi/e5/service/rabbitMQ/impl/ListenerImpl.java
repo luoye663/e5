@@ -38,11 +38,14 @@ public class ListenerImpl {
     @RabbitListener(queues = "delay_queue2", containerFactory = "rabbitListenerContainerFactory")
     public void listen(Message message, Channel channel) throws IOException {
         logger.info("消费者1开始处理消息： {},时间戳:{}" ,message,System.currentTimeMillis());
+        System.out.println("消费者1开始处理消息："+System.currentTimeMillis());
         int github_id = Integer.valueOf(new String(message.getBody()));
         try {
             Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
             if (Outlook == null) {
                 logger.warn("未找到此用户,github_id: {}",github_id);
+                /*这里也发送ack，不然会照成队列堆积*/
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
                 return;
             }
             outlookService.getMailList(Outlook);

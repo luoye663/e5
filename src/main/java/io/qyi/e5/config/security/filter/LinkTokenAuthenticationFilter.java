@@ -37,10 +37,10 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
         if (token != null) {
             RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
             if (redisUtil.hasKey("token:" + token)) {
-                Map<Object, Object> userInfo = redisUtil.hmget("token:" +token);
+                Map<Object, Object> userInfo = redisUtil.hmget("token:" + token);
                 //        将未认证的Authentication转换成自定义的用户认证Token
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken();
-                UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(userInfo.get("github_name").toString(),
+                UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(userInfo.get("github_name") == null ? "" : userInfo.get("github_name").toString(),
                         userInfo.get("avatar_url").toString(), (int) userInfo.get("github_id"), AuthorityUtils.createAuthorityList("user"));
                 authenticationToken1.setDetails(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken1);
@@ -50,7 +50,7 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("--------------Token鉴权---------------");
         /*设置跨域*/
         HttpServletResponse response = httpServletResponse;
-        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST");
         response.setHeader("Access-Control-Max-Age", "3600");
