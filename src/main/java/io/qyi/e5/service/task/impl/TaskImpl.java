@@ -56,6 +56,7 @@ public class TaskImpl implements ITask {
             Outlook next = iterator.next();
             /*根据用户设置生成随机数*/
             String Expiration = getRandom(next.getCronTimeRandomStart(), next.getCronTimeRandomEnd());
+            System.out.println("生成随机调用时间,github ID" + next.getGithubId() + ",时间:" + Expiration);
             send(next.getGithubId(), Expiration);
         }
     }

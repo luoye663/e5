@@ -4,10 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: e5
@@ -44,8 +49,14 @@ public class dome01 {
         for (int i = 0; i < 30; i++) {
             System.out.println(getRandom(3600,7200));
         }
+    }
+
+    @Test
+    public void ScheduledExecutor(){
 
     }
+
+
 
     public String getRandom(int start, int end){
         Random r = new Random();
