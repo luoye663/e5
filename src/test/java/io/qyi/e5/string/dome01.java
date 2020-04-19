@@ -42,14 +42,14 @@ public class dome01 {
     @Test
     public void r(){
         for (int i = 0; i < 30; i++) {
-            System.out.println(getRandom(60,120));
+            System.out.println(getRandom(3600,7200));
         }
 
     }
 
     public String getRandom(int start, int end){
         Random r = new Random();
-        String Expiration = String.valueOf((r.nextInt(end-start +1) + start));
+        String Expiration = String.valueOf((r.nextInt(end-start +1) + start) );
         return Expiration;
     }
 }

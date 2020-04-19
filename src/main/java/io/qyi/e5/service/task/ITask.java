@@ -10,4 +10,6 @@ public interface ITask {
     void sendTaskOutlookMQ(int github_id);
     void sendTaskOutlookMQALL();
 
+    void executeE5(int github_id);
+
 }

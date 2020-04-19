@@ -38,12 +38,12 @@ public class TaskImpl implements ITask {
     public void sendTaskOutlookMQ(int github_id) {
         Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
         if (Outlook == null) {
-            logger.warn("未找到此用户,github_id: {}",github_id);
+            logger.warn("未找到此用户,github_id: {}", github_id);
             return;
         }
         /*根据用户设置生成随机数*/
-        String Expiration = getRandom( Outlook.getCronTimeRandomStart(),Outlook.getCronTimeRandomEnd());
-        send(github_id,Expiration);
+        String Expiration = getRandom(Outlook.getCronTimeRandomStart(), Outlook.getCronTimeRandomEnd());
+        send(github_id, Expiration);
 
     }
 
@@ -55,20 +55,32 @@ public class TaskImpl implements ITask {
         while (iterator.hasNext()) {
             Outlook next = iterator.next();
             /*根据用户设置生成随机数*/
-            String Expiration = getRandom( next.getCronTimeRandomStart(),next.getCronTimeRandomEnd());
+            String Expiration = getRandom(next.getCronTimeRandomStart(), next.getCronTimeRandomEnd());
             send(next.getGithubId(), Expiration);
         }
     }
 
+    @Override
+    @Async
+    public void executeE5(int github_id) {
+        Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
+        if (Outlook == null) {
+            logger.warn("未找到此用户,github_id: {}", github_id);
+            return;
+        }
+        outlookService.getMailList(Outlook);
+    }
+
     /**
      * 发送消息到队列
-    * @Description:
-    * @param: * @param msg
-    * @param Expiration
-    * @return: void
-    * @Author: 落叶随风
-    * @Date: 2020/4/16
-    */
+     *
+     * @param Expiration
+     * @Description:
+     * @param: * @param msg
+     * @return: void
+     * @Author: 落叶随风
+     * @Date: 2020/4/16
+     */
     public void send(Object msg, String Expiration) {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
 
@@ -82,14 +94,15 @@ public class TaskImpl implements ITask {
 
     /**
      * 生成随机数
-    * @Description:
-    * @param: * @param start
-    * @param end
-    * @return: java.lang.String
-    * @Author: 落叶随风
-    * @Date: 2020/4/16
-    */
-    public String getRandom(int start, int end){
+     *
+     * @param end
+     * @Description:
+     * @param: * @param start
+     * @return: java.lang.String
+     * @Author: 落叶随风
+     * @Date: 2020/4/16
+     */
+    public String getRandom(int start, int end) {
         Random r = new Random();
         String Expiration = String.valueOf((r.nextInt(end - start + 1) + start) * 1000);
         return Expiration;
