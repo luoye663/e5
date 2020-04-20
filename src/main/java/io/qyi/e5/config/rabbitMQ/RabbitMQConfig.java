@@ -27,18 +27,7 @@ public class RabbitMQConfig {
      * */
     @Bean
     public Queue fanoutQueue1() {
-        Map<String, Object> arguments = new HashMap<>(2);
-        arguments.put("x-dead-letter-exchange", "delay");
-        arguments.put("x-dead-letter-routing-key", "delay_key");
-        return new Queue("delay_queue1", true, false, false, arguments);
-    }
-    /**
-     *
-     *创建消息处理队列
-     */
-    @Bean
-    public Queue fanoutQueue2() {
-        return new Queue("delay_queue2", true); // 队列持久
+        return new Queue("delay_queue1", true, false, false);
     }
 
     /**
@@ -51,8 +40,10 @@ public class RabbitMQConfig {
      * @return
      */
     @Bean
-    public DirectExchange fanoutExchangeDelay() {
-        return new DirectExchange("delay",true, false);
+    public CustomExchange customExchangeDelay() {
+        Map<String, Object> arg = new HashMap<>();
+        arg.put("x-delayed-type", "direct");
+        return new CustomExchange("delay","x-delayed-message",true, false,arg);
     }
 
     /*@Bean
@@ -63,13 +54,8 @@ public class RabbitMQConfig {
     //绑定  将队列和交换机绑定,
     @Bean
     public Binding bindingFanoutQueue1() {
-        return BindingBuilder.bind(fanoutQueue1()).to(fanoutExchangeDelay()).with("delay");
+        return BindingBuilder.bind(fanoutQueue1()).to(customExchangeDelay()).with("delay").noargs();
     }
-    @Bean
-    public Binding bindingFanoutQueue2() {
-        return BindingBuilder.bind(fanoutQueue2()).to(fanoutExchangeDelay()).with("delay_key");
-    }
-
 
 
     //    无限循环问题

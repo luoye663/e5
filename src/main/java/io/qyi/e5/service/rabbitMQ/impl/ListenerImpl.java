@@ -35,7 +35,7 @@ public class ListenerImpl {
     ITask Task;
 
     @RabbitHandler
-    @RabbitListener(queues = "delay_queue2", containerFactory = "rabbitListenerContainerFactory")
+    @RabbitListener(queues = "delay_queue1", containerFactory = "rabbitListenerContainerFactory")
     public void listen(Message message, Channel channel) throws IOException {
         logger.info("消费者1开始处理消息： {},时间戳:{}" ,message,System.currentTimeMillis());
         System.out.println("消费者1开始处理消息："+System.currentTimeMillis());

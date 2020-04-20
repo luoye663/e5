@@ -56,7 +56,7 @@ public class TaskImpl implements ITask {
             Outlook next = iterator.next();
             /*根据用户设置生成随机数*/
             String Expiration = getRandom(next.getCronTimeRandomStart(), next.getCronTimeRandomEnd());
-            System.out.println("生成随机调用时间,github ID" + next.getGithubId() + ",时间:" + Expiration);
+//            System.out.println("生成随机调用时间,github ID" + next.getGithubId() + ",时间:" + Expiration);
             send(next.getGithubId(), Expiration);
         }
     }
@@ -88,7 +88,9 @@ public class TaskImpl implements ITask {
         rabbitTemplate.convertAndSend("delay", "delay", msg, message -> {
             MessageProperties messageProperties = message.getMessageProperties();
             // 设置这条消息的过期时间
-            messageProperties.setExpiration(Expiration);
+//            messageProperties.setExpiration(Expiration);
+
+            messageProperties.setHeader("x-delay",Expiration);
             return message;
         }, correlationData);
     }
