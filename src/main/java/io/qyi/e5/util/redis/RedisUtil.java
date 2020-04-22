@@ -50,6 +50,19 @@ public class RedisUtil {
     }
 
     /**
+     * 删除所有键值对
+     * @title deleteALl
+     * @description
+     * @author 落叶随风
+     * @updateTime 2020/4/22 22:53
+     * @throws
+     */
+    public void deleteALL() {
+        Set<String> keys = redisTemplate.keys("*");
+        redisTemplate.delete(keys);
+    }
+
+    /**
      * 根据key 获取过期时间
      *
      * @param key 键 不能为null

@@ -47,5 +47,12 @@ public class TestController {
         return "ok";
     }
 
+    @GetMapping("/emptyRedis")
+    public String emptyRedis() {
+        redisUtil.deleteALL();
+        return "ok";
+    }
+
+
 
 }

@@ -6,6 +6,7 @@ import io.qyi.e5.bean.result.ResultEnum;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
+import io.qyi.e5.service.task.ITask;
 import io.qyi.e5.util.EncryptUtil;
 import io.qyi.e5.util.ResultUtil;
 import io.qyi.e5.util.redis.RedisUtil;
@@ -42,6 +43,9 @@ public class AuthController {
     @Value("${outlook.authorize.url}")
     String authorizeUrl;
 
+    @Autowired
+    ITask Task;
+
     @RequestMapping("/receive")
     public Result Receive(String code, String state, String session_state) throws Exception {
         if (!redisUtil.hasKey(states + state)) {
@@ -62,6 +66,8 @@ public class AuthController {
         if (!authorization_code) {
             return ResultUtil.error(-3, "clientId 或 clientSecret 填写错误!授权失败!");
         }
+        /*添加此用户进消息队列*/
+        Task.executeE5(outlook.getGithubId());
         return ResultUtil.success();
     }
 
