@@ -67,7 +67,7 @@ public class AuthController {
             return ResultUtil.error(-3, "clientId 或 clientSecret 填写错误!授权失败!");
         }
         /*添加此用户进消息队列*/
-        Task.executeE5(outlook.getGithubId());
+        Task.sendTaskOutlookMQ(outlook.getGithubId());
         return ResultUtil.success();
     }
 
