@@ -50,20 +50,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .apply(usernamePasswordAuthenticationConfig);
         /*关闭创建session*/
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        /*formLogin()
-                .loginPage("/user/login")// 登陆页面
-                .loginProcessingUrl("/user/loginFrom")// 登陆表单提交请求
-                .and()*/
         http.authorizeRequests().antMatchers("/user/login", "/user/loginFrom", "/auth2/getGithubUrl").permitAll()// 指定相应的请求 不需要验证
 //                .and()
 //                .authorizeRequests().antMatchers("/quartz/**").permitAll()//测试
                 .anyRequest()// 任何请求
                 .authenticated();// 都需要身份认证
-//        http.exceptionHandling().accessDeniedHandler();
-//        http.formLogin().loginProcessingUrl("api/getInfo");
 
-//        http.formLogin().usernameParameter("username");
-//        http.formLogin().passwordParameter("password");
 
     }
 
