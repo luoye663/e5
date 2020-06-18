@@ -4,7 +4,7 @@
 <!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，
     当设置成trace时，会看到log4j2内部各种详细输出-->
 <!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
-<configuration status="DEBUG" monitorInterval="5">
+<configuration status="INFO" monitorInterval="5">
     <Properties>
         <!-- 日志模板 -->
         <Property name="log_pattern" value="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>

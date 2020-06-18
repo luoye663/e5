@@ -41,9 +41,11 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     @Value("${isdebug}")
     boolean isDebug;
 
+    @Value("${user.admin.githubId}")
+    int adminGithubId;
+
     @Autowired
     RedisUtil redisUtil;
-
 
 
     @Autowired
@@ -59,15 +61,17 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         String state = authenticationToken.getState();
         logger.info("Github 认证: code：{} state：{} Token：", code, state);
         Map<String, Object> userInfo_redis = new HashMap<>();
+
         /*是否调试模式*/
         if (isDebug) {
             String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
             UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken("debugName",
-                    "DebugAvatar", 19658189,token, AuthorityUtils.createAuthorityList("user"));
+                    "DebugAvatar", adminGithubId, token, "ADMIN", AuthorityUtils.createAuthorityList("ROLE_ADMIN1"));
             authenticationToken1.setDetails(authenticationToken);
             userInfo_redis.put("github_name", "debug");
-            userInfo_redis.put("github_id", 19658189);
+            userInfo_redis.put("github_id", adminGithubId);
             userInfo_redis.put("avatar_url", "https://www.baidu.com");
+            userInfo_redis.put("authority","ROLE_ADMIN1");
             redisUtil.hmset(token_ + token, userInfo_redis, 3600);
             return authenticationToken1;
         }
@@ -105,16 +109,23 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         }
 
         String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
+        /*配置角色*/
+        String Authority = "ROLE_user";
+        if (adminGithubId == github.getGithubId()) {
+            Authority = "ROLE_admin";
+        }
 
         /*写token信息到redis*/
         userInfo_redis.put("github_name", github.getName());
         userInfo_redis.put("github_id", github.getGithubId());
         userInfo_redis.put("avatar_url", github.getAvatarUrl());
+        userInfo_redis.put("authority",Authority);
         redisUtil.hmset(token_ + token, userInfo_redis, 3600);
+
 
 //       创建一个已认证的token
         UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(github.getName(),
-                github.getAvatarUrl(), github.getGithubId(), token, AuthorityUtils.createAuthorityList("user"));
+                github.getAvatarUrl(), github.getGithubId(), token, Authority, AuthorityUtils.createAuthorityList(Authority));
 
 //      设置一些详细信息
         authenticationToken1.setDetails(authenticationToken);

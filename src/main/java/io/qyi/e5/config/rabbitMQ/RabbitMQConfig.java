@@ -22,12 +22,13 @@ import java.util.Map;
 public class RabbitMQConfig {
     @Value("")
     private String DirectQueueName;
+
     /**
      * 处理死信队列的消费队列
-     * */
+     */
     @Bean
     public Queue fanoutQueue1() {
-        return new Queue("delay_queue1", true, false, false);
+        return new Queue("delay_queue3", true, false, false);
     }
 
     /**
@@ -37,13 +38,14 @@ public class RabbitMQConfig {
      * HeadersExchange ：通过添加属性key-value匹配
      * DirectExchange:按照routingkey分发到指定队列
      * TopicExchange:多关键字匹配
+     *
      * @return
      */
     @Bean
     public CustomExchange customExchangeDelay() {
         Map<String, Object> arg = new HashMap<>();
         arg.put("x-delayed-type", "direct");
-        return new CustomExchange("delay","x-delayed-message",true, false,arg);
+        return new CustomExchange("delay3", "x-delayed-message", true, false, arg);
     }
 
     /*@Bean
@@ -54,7 +56,7 @@ public class RabbitMQConfig {
     //绑定  将队列和交换机绑定,
     @Bean
     public Binding bindingFanoutQueue1() {
-        return BindingBuilder.bind(fanoutQueue1()).to(customExchangeDelay()).with("delay").noargs();
+        return BindingBuilder.bind(fanoutQueue1()).to(customExchangeDelay()).with("delay3").noargs();
     }
 
 

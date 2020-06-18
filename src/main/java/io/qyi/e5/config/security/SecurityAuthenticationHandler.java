@@ -25,7 +25,7 @@ import java.util.Map;
  * @create: 2019-12-27 08:57
  **/
 @Component
-public class SecurityAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler , LogoutSuccessHandler {
+public class SecurityAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler , LogoutSuccessHandler  {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         UsernamePasswordAuthenticationToken at = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -35,6 +35,7 @@ public class SecurityAuthenticationHandler implements AuthenticationSuccessHandl
         Map<String, String> token = new HashMap<>();
         token.put("token", at.getToken());
         token.put("username", at.getName());
+        token.put("authority", at.getAuthority());
         writer.write(gson.toJson(ResultUtil.success(token)) );
         writer.flush();
     }
