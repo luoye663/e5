@@ -58,11 +58,12 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 
 
     //  创建已认证的用户密码认证对象
-    public UsernamePasswordAuthenticationToken(String name, String avatar_url, int github_id, Collection<? extends GrantedAuthority> authorities) {
+    public UsernamePasswordAuthenticationToken(String name, String avatar_url, int github_id,String Authority, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.name = name;
         this.avatar_url = avatar_url;
         this.github_id = github_id;
+        this.Authority = Authority;
         super.setAuthenticated(true);
     }
 

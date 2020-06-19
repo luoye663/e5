@@ -206,6 +206,9 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             count = jsonObject.get("value").getAsJsonArray().size();
         }
         JsonArray value = jsonObject.get("value").getAsJsonArray();
+        if (count == 0) {
+            count = value.size();
+        }
         for (int i = 0; i < count - 1; i++) {
             JsonObject mail = value.get(i).getAsJsonObject();
             String id = mail.get("id").getAsString();

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.service.task.ITask;
+import io.qyi.e5.util.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.MessageProperties;
@@ -33,6 +34,9 @@ public class TaskImpl implements ITask {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    RedisUtil redisUtil;
+
     @Override
     @Async
     public void sendTaskOutlookMQ(int github_id) {
@@ -42,9 +46,12 @@ public class TaskImpl implements ITask {
             return;
         }
         /*根据用户设置生成随机数*/
-        String Expiration = getRandom(Outlook.getCronTimeRandomStart(), Outlook.getCronTimeRandomEnd());
-        send(github_id, Expiration);
-
+        int Expiration = getRandom(Outlook.getCronTimeRandomStart(), Outlook.getCronTimeRandomEnd());
+        /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
+        if (!redisUtil.hasKey("user.mq:" + github_id)) {
+            redisUtil.set("user.mq:" + github_id, 0, Expiration - 10);
+            send(github_id, Expiration* 1000);
+        }
     }
 
     @Override
@@ -55,14 +62,16 @@ public class TaskImpl implements ITask {
         while (iterator.hasNext()) {
             Outlook next = iterator.next();
             /*根据用户设置生成随机数*/
-            String Expiration = getRandom(next.getCronTimeRandomStart(), next.getCronTimeRandomEnd());
-//            System.out.println("生成随机调用时间,github ID" + next.getGithubId() + ",时间:" + Expiration);
-            send(next.getGithubId(), Expiration);
+            int Expiration = getRandom(next.getCronTimeRandomStart(), next.getCronTimeRandomEnd());
+            /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
+            if (!redisUtil.hasKey("user.mq:" + next.getGithubId())) {
+                redisUtil.set("user.mq:" + next.getGithubId(), 0, Expiration - 10);
+                send(next.getGithubId(), Expiration * 1000);
+            }
         }
     }
 
     @Override
-    @Async
     public void executeE5(int github_id) {
         Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
         if (Outlook == null) {
@@ -82,7 +91,7 @@ public class TaskImpl implements ITask {
      * @Author: 落叶随风
      * @Date: 2020/4/16
      */
-    public void send(Object msg, String Expiration) {
+    public void send(Object msg, int Expiration) {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
 
         rabbitTemplate.convertAndSend("delay", "delay", msg, message -> {
@@ -90,7 +99,7 @@ public class TaskImpl implements ITask {
             // 设置这条消息的过期时间
 //            messageProperties.setExpiration(Expiration);
 
-            messageProperties.setHeader("x-delay",Expiration);
+            messageProperties.setHeader("x-delay", Expiration);
             return message;
         }, correlationData);
     }
@@ -105,9 +114,9 @@ public class TaskImpl implements ITask {
      * @Author: 落叶随风
      * @Date: 2020/4/16
      */
-    public String getRandom(int start, int end) {
+    public int getRandom(int start, int end) {
         Random r = new Random();
-        String Expiration = String.valueOf((r.nextInt(end - start + 1) + start) * 1000);
+        int Expiration = (r.nextInt(end - start + 1) + start);
         return Expiration;
     }
 }
