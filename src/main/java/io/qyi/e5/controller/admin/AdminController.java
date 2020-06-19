@@ -28,7 +28,7 @@ import java.util.UUID;
  **/
 @RestController
 @RequestMapping("/admin")
-public class TestController {
+public class AdminController {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
@@ -45,6 +45,7 @@ public class TestController {
     public void send() {
         Task.sendTaskOutlookMQ(19658189);
     }
+
     @GetMapping("/sendAll")
     public String sendAll() {
         Task.sendTaskOutlookMQALL();

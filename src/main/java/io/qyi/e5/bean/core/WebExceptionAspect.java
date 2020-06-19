@@ -36,32 +36,28 @@ public class WebExceptionAspect {
     /**
      * 拦截web层异常，记录异常日志，并返回友好信息到前端
      *
-     * @param e
-     *            异常对象
+     * @param e 异常对象
      */
     @AfterThrowing(pointcut = "bountyHunterPointcut()", throwing = "e")
     public void handleThrowing(JoinPoint joinPoint, Exception e) {
-        //e.printStackTrace();
-        /*if (null != user){
-            log.error("发现异常!操作用户手机号："+user.getMobile());
-        }*/
-        logger.error("发现异常！方法："+  joinPoint.getSignature().getName()+"--->异常",e);
+        long time = System.currentTimeMillis();
+        logger.error("发现异常！方法：{} --->异常 {}, 异常ID: {}", joinPoint.getSignature().getName(), e, time);
         //这里输入友好性信息
-        if (!StringUtils.isEmpty(e.getMessage())){
-            logger.error("异常",e.getMessage());
-            writeContent(500,e.getMessage());
-        }else {
-            writeContent(500,"十分抱歉，出现异常！程序猿小哥正在紧急抢修...");
+//        writeContent(500, "十分抱歉，出现异常！程序猿小哥正在紧急抢修...", time);
+        if (!StringUtils.isEmpty(e.getMessage())) {
+            logger.error("异常", e.getMessage());
+            writeContent(500, e.getMessage(),time);
+        } else {
+            writeContent(500, "十分抱歉，出现异常！程序猿小哥正在紧急抢修...", time);
         }
     }
 
     /**
      * 将内容输出到浏览器
      *
-     * @param content
-     *            输出内容
+     * @param content 输出内容
      */
-    public static void writeContent(Integer code,String content) {
+    public static void writeContent(Integer code, String content, long time) {
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
                 .getResponse();
         response.setCharacterEncoding("UTF-8");
@@ -72,10 +68,10 @@ public class WebExceptionAspect {
         try {
             writer = response.getWriter();
             jsonGenerator = (new ObjectMapper()).getFactory().createGenerator(writer);
-            jsonGenerator.writeObject(ResultUtil.error(code,content));
+            jsonGenerator.writeObject(ResultUtil.error(code, time, content));
         } catch (IOException e1) {
             e1.printStackTrace();
-        }finally {
+        } finally {
             writer.flush();
             writer.close();
         }

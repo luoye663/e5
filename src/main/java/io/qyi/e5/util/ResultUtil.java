@@ -31,6 +31,13 @@ public class ResultUtil extends Throwable {
         result.setMsg(msg);
         return result;
     }
+    public static Result error(Integer code, long time, String msg) {
+        Result result = new Result();
+        result.setCode(code);
+        result.setMsg(msg);
+        result.setData(time);
+        return result;
+    }
     public static Result success(ResultEnum resultEnum, Object object) {
         Result result = new Result();
         result.setCode(resultEnum.getCode());

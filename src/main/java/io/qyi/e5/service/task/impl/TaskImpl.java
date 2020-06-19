@@ -72,13 +72,13 @@ public class TaskImpl implements ITask {
     }
 
     @Override
-    public void executeE5(int github_id) {
+    public boolean executeE5(int github_id) {
         Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
         if (Outlook == null) {
             logger.warn("未找到此用户,github_id: {}", github_id);
-            return;
+            return false;
         }
-        outlookService.getMailList(Outlook);
+        return outlookService.getMailList(Outlook);
     }
 
     /**
