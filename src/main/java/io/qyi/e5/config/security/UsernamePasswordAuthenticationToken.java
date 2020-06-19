@@ -29,7 +29,10 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 
     private String Token;
 
+    private String Authority;
+
     private int github_id;
+
 
     //    创建未认证的用户名密码认证对象
     public UsernamePasswordAuthenticationToken() {
@@ -64,14 +67,16 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
     }
 
     //  创建已认证的用户密码认证对象
-    public UsernamePasswordAuthenticationToken(String name, String avatar_url, int github_id, String token, Collection<? extends GrantedAuthority> authorities) {
+    public UsernamePasswordAuthenticationToken(String name, String avatar_url, int github_id, String token, String Authority, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.name = name;
         this.avatar_url = avatar_url;
         this.github_id = github_id;
         this.Token = token;
+        this.Authority = Authority;
         super.setAuthenticated(true);
     }
+
 
     public String getToken() {
         return Token;
@@ -131,5 +136,13 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 
     public void setGithub_id(int github_id) {
         this.github_id = github_id;
+    }
+
+    public String getAuthority() {
+        return Authority;
+    }
+
+    public void setAuthority(String authority) {
+        Authority = authority;
     }
 }

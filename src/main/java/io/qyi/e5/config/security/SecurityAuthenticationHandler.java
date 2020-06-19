@@ -2,6 +2,9 @@ package io.qyi.e5.config.security;
 
 import com.google.gson.Gson;
 import io.qyi.e5.util.ResultUtil;
+import io.qyi.e5.util.redis.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,16 +28,21 @@ import java.util.Map;
  * @create: 2019-12-27 08:57
  **/
 @Component
-public class SecurityAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler , LogoutSuccessHandler {
+public class SecurityAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler , LogoutSuccessHandler  {
+    @Autowired
+    RedisUtil redisUtil;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         UsernamePasswordAuthenticationToken at = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         Gson gson = new Gson();
         httpServletResponse.setContentType("application/json;charset=utf-8");
         PrintWriter writer = httpServletResponse.getWriter();
-        Map<String, String> token = new HashMap<>();
+        Map<String, Object> token = new HashMap<>();
         token.put("token", at.getToken());
         token.put("username", at.getName());
+        token.put("authority", at.getAuthority());
+        token.put("expire", (int) redisUtil.getExpire("token:" + at.getToken()));
         writer.write(gson.toJson(ResultUtil.success(token)) );
         writer.flush();
     }
