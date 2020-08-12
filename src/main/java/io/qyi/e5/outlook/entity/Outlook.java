@@ -59,4 +59,5 @@ public class Outlook implements Serializable {
     private Integer cronTimeRandomEnd;
 
 
+
 }

@@ -28,7 +28,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public Queue fanoutQueue1() {
-        return new Queue("delay_queue3", true, false, false);
+        return new Queue("delay_queue1", true, false, false);
     }
 
     /**
@@ -45,7 +45,7 @@ public class RabbitMQConfig {
     public CustomExchange customExchangeDelay() {
         Map<String, Object> arg = new HashMap<>();
         arg.put("x-delayed-type", "direct");
-        return new CustomExchange("delay3", "x-delayed-message", true, false, arg);
+        return new CustomExchange("delay", "x-delayed-message", true, false, arg);
     }
 
     /*@Bean
@@ -73,7 +73,7 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         factory.setConcurrentConsumers(1);
-        factory.setMaxConcurrentConsumers(20);
+        factory.setMaxConcurrentConsumers(50);
         factory.setPrefetchCount(20);
 
         factory.setConnectionFactory(connectionFactory);
