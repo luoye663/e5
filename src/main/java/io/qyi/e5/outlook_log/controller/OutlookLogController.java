@@ -58,7 +58,7 @@ public class OutlookLogController {
         int github_id = authentication.getGithub_id();
 
         QueryWrapper<OutlookLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("github_id", github_id);
+        queryWrapper.eq("github_id", github_id).orderByDesc("call_time");
         List<OutlookLog> list = outlookLogService.list(queryWrapper);
         Iterator<OutlookLog> iterator = list.iterator();
         List<LogVo> logVo = new LinkedList<>();
