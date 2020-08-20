@@ -3,6 +3,7 @@ package io.qyi.e5.service.task.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
+import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.service.task.ITask;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.slf4j.Logger;
@@ -36,6 +37,9 @@ public class TaskImpl implements ITask {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    IOutlookLogService outlookLogService;
 
     @Override
     @Async
@@ -78,7 +82,11 @@ public class TaskImpl implements ITask {
             logger.warn("未找到此用户,github_id: {}", github_id);
             return false;
         }
-        return outlookService.getMailList(Outlook);
+        boolean mailList = outlookService.getMailList(Outlook);
+        if (!mailList) {
+            outlookLogService.addLog(github_id, "error", 0, "检测到错误，下次将不再自动调用，请修正错误后再授权开启续订。" );
+        }
+        return mailList;
     }
 
     /**
