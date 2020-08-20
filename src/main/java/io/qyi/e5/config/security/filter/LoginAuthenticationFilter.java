@@ -1,6 +1,7 @@
 package io.qyi.e5.config.security.filter;
 
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -23,6 +24,7 @@ import java.io.IOException;
  * @author: 落叶随风
  * @create: 2020-02-28 11:56
  **/
+@Slf4j
 public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     protected LoginAuthenticationFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
@@ -34,6 +36,7 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
 
     public LoginAuthenticationFilter() {
         super(new AntPathRequestMatcher("/auth2/receive", "GET"));
+        log.info("注册 LoginAuthenticationFilter");
     }
 
 

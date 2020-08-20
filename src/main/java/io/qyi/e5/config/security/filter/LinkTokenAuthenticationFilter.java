@@ -52,7 +52,7 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
         log.info("--------------Token鉴权---------------");
         /*设置跨域*/
         HttpServletResponse response = httpServletResponse;
-        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Origin", "e5.qyi.io");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST");
         response.setHeader("Access-Control-Max-Age", "3600");

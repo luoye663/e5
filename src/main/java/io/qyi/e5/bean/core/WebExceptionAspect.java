@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qyi.e5.util.ResultUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -26,6 +27,7 @@ import java.io.PrintWriter;
  **/
 @Aspect
 @Component
+@Slf4j
 public class WebExceptionAspect {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -58,6 +60,11 @@ public class WebExceptionAspect {
      * @param content 输出内容
      */
     public static void writeContent(Integer code, String content, long time) {
+        if (RequestContextHolder.getRequestAttributes()==null) {
+            log.error("writeContent 异常!");
+            return;
+        }
+
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
                 .getResponse();
         response.setCharacterEncoding("UTF-8");
