@@ -32,8 +32,10 @@ public class UrlInvocationSecurityMetadataSourceService implements FilterInvocat
         Collection<ConfigAttribute> array;
         ConfigAttribute cfg;
         Map<String, String> permissions = new HashMap<>();
+        /*这里只是简单的配置*/
         permissions.put("/admin/**", "admin");
         permissions.put("/**", "user");
+        permissions.put("/auth2/**", "ROLE_ANONYMOUS");
         Iterator<Map.Entry<String, String>> iterator = permissions.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();

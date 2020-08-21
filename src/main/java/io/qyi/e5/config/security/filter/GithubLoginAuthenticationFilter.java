@@ -3,7 +3,9 @@ package io.qyi.e5.config.security.filter;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,23 +28,27 @@ import java.io.IOException;
  * @create: 2020-02-28 11:56
  **/
 @Slf4j
-public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    protected LoginAuthenticationFilter(String defaultFilterProcessesUrl) {
+public class GithubLoginAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+
+
+    protected GithubLoginAuthenticationFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
     }
 
-    protected LoginAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
+    protected GithubLoginAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
         super(requiresAuthenticationRequestMatcher);
     }
 
-    public LoginAuthenticationFilter() {
+    public GithubLoginAuthenticationFilter() {
         super(new AntPathRequestMatcher("/auth2/receive", "GET"));
         log.info("注册 LoginAuthenticationFilter");
     }
 
 
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
+        log.info("接收github回调参数!");
         /*if (!httpServletRequest.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("不支持该验证方法: " + httpServletRequest.getMethod());
         } else {
@@ -73,4 +80,5 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
     private void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
     }
+
 }
