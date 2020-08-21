@@ -4,12 +4,10 @@ import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.util.SpringUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -52,9 +50,9 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
         log.info("--------------Token鉴权---------------");
         /*设置跨域*/
         HttpServletResponse response = httpServletResponse;
-        response.setHeader("Access-Control-Allow-Origin", "e5.qyi.io");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST");
+        response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST,OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
         /*如果是OPTIONS则结束请求*/

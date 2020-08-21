@@ -25,18 +25,18 @@ import java.util.Iterator;
 public class UrlAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
-        log.debug("进入权限判断!");
+        log.info("进入权限判断!");
         if (collection == null) {
             return;
         }
-        log.debug("object is a URL. {}", o.toString());
+        log.info("object is a URL. {}", o.toString());
         //所请求的资源拥有的权限(一个资源对多个权限)
         Iterator<ConfigAttribute> iterator = collection.iterator();
         while (iterator.hasNext()) {
             ConfigAttribute configAttribute = iterator.next();
             //访问所请求资源所需要的权限
             String needPermission = configAttribute.getAttribute();
-            log.debug("访问 " + o.toString() + " 需要的权限是：" + needPermission);
+            log.info("访问 " + o.toString() + " 需要的权限是：" + needPermission);
             if (needPermission == null) {
                 break;
             }

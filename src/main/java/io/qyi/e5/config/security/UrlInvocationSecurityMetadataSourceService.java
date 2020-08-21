@@ -36,6 +36,8 @@ public class UrlInvocationSecurityMetadataSourceService implements FilterInvocat
         permissions.put("/admin/**", "admin");
         permissions.put("/**", "user");
         permissions.put("/auth2/**", "ROLE_ANONYMOUS");
+        permissions.put("/error", "ROLE_ANONYMOUS");
+
         Iterator<Map.Entry<String, String>> iterator = permissions.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();
