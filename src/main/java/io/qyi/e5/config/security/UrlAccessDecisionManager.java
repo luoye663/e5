@@ -44,6 +44,8 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             for (GrantedAuthority ga : authorities) {
                 if (needPermission.equals(ga.getAuthority())) {
+                    log.info("当前角色: " + ga.getAuthority());
+                    log.info("访问 " + o.toString() + " 已授权!");
                     return;
                 }
             }

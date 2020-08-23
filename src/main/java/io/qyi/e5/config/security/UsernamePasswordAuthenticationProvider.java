@@ -67,7 +67,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
             List<String> list = new ArrayList<>();
             list.add("admin");
             list.add("user");
-            String[] l =list.toArray(new String[list.size()]);
+            String[] l = list.toArray(new String[list.size()]);
             String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
             UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken("debugName",
                     "DebugAvatar", adminGithubId, token, "admin", AuthorityUtils.createAuthorityList(l));
@@ -114,23 +114,23 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
         String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
         /*配置角色,这里只是简单的配置，实际上需要从数据库中读取角色*/
-        List<String> list = new ArrayList<>();
-        list.add("user");
+        List<String> list_Authority = new ArrayList<>();
+        list_Authority.add("user");
         if (adminGithubId == github.getGithubId()) {
-            list.add("admin");
+            list_Authority.add("admin");
         }
-        String[] Authority =list.toArray(new String[list.size()]);
+        String[] Authority = list_Authority.toArray(new String[list_Authority.size()]);
         /*写token信息到redis*/
         userInfo_redis.put("github_name", github.getName());
         userInfo_redis.put("github_id", github.getGithubId());
         userInfo_redis.put("avatar_url", github.getAvatarUrl());
-        userInfo_redis.put("authority", Authority);
+        userInfo_redis.put("authority", list_Authority);
         redisUtil.hmset(token_ + token, userInfo_redis, tokenExpire);
 
 
 //       创建一个已认证的token
         UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(github.getName(),
-                github.getAvatarUrl(), github.getGithubId() , AuthorityUtils.createAuthorityList(Authority));
+                github.getAvatarUrl(), github.getGithubId(), token, "user", AuthorityUtils.createAuthorityList(Authority));
 
 //      设置一些详细信息
         authenticationToken1.setDetails(authenticationToken);

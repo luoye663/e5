@@ -31,18 +31,22 @@ import java.util.Map;
 public class SecurityAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler , LogoutSuccessHandler  {
     @Autowired
     RedisUtil redisUtil;
+    @Value("${redis.user.token}")
+    String token_;
+
+    private static Gson gson = new Gson();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         UsernamePasswordAuthenticationToken at = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Gson gson = new Gson();
+
         httpServletResponse.setContentType("application/json;charset=utf-8");
         PrintWriter writer = httpServletResponse.getWriter();
         Map<String, Object> token = new HashMap<>();
         token.put("token", at.getToken());
         token.put("username", at.getName());
         token.put("authority", at.getAuthority());
-        token.put("expire", (int) redisUtil.getExpire("token:" + at.getToken()));
+        token.put("expire", redisUtil.getExpire(token_ + at.getToken()));
         writer.write(gson.toJson(ResultUtil.success(token)) );
         writer.flush();
     }
@@ -51,7 +55,7 @@ public class SecurityAuthenticationHandler implements AuthenticationSuccessHandl
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
         PrintWriter writer = httpServletResponse.getWriter();
-        writer.write("Failure");
+        writer.write(gson.toJson(ResultUtil.error(-1, "failed!")));
         writer.flush();
     }
 

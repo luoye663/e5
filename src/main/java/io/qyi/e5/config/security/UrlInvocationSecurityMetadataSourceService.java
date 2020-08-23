@@ -1,6 +1,7 @@
 package io.qyi.e5.config.security;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -21,6 +22,13 @@ import java.util.*;
 @Service
 public class UrlInvocationSecurityMetadataSourceService implements FilterInvocationSecurityMetadataSource {
 
+    @Value("web.security.admin")
+    private String[] securityAdmin;
+    @Value("web.security.user")
+    private String[] securityUser;
+    @Value("web.security.role_anonymous")
+    private String[] securitAnonymous;
+
     private HashMap<String, Collection<ConfigAttribute>> map =null;
     /**
      * 加载权限表中所有权限
@@ -31,22 +39,22 @@ public class UrlInvocationSecurityMetadataSourceService implements FilterInvocat
         map = new HashMap<>();
         Collection<ConfigAttribute> array;
         ConfigAttribute cfg;
-        Map<String, String> permissions = new HashMap<>();
+        Map<String, String []> permissions = new HashMap<>();
         /*这里只是简单的配置*/
-        permissions.put("/admin/**", "admin");
-        permissions.put("/**", "user");
-        permissions.put("/auth2/**", "ROLE_ANONYMOUS");
-        permissions.put("/error", "ROLE_ANONYMOUS");
+        permissions.put("admin", securityAdmin);
+        permissions.put("user",  securityUser);
+        permissions.put("ROLE_ANONYMOUS", securitAnonymous);
 
-        Iterator<Map.Entry<String, String>> iterator = permissions.entrySet().iterator();
+        Iterator<Map.Entry<String, String[]>> iterator = permissions.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, String> next = iterator.next();
+            Map.Entry<String, String[]> next = iterator.next();
             String key = next.getKey();
-            String value = next.getValue();
-
+            String[] value = next.getValue();
             array = new ArrayList<>();
-            cfg = new SecurityConfig(value);
-            array.add(cfg);
+            for (int i = 0; i < value.length; i++) {
+                cfg = new SecurityConfig(value[i]);
+                array.add(cfg);
+            }
             map.put(key, array);
         }
 

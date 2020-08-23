@@ -59,7 +59,6 @@ public class AdminController {
     }
 
     @GetMapping("/test")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String test() {
         return "ok";
     }
