@@ -102,7 +102,7 @@ public class TaskImpl implements ITask {
     public void send(Object msg, int Expiration) {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
 
-        rabbitTemplate.convertAndSend("delay", "delay", msg, message -> {
+        rabbitTemplate.convertAndSend("delay", "routing_delay", msg, message -> {
             MessageProperties messageProperties = message.getMessageProperties();
             // 设置这条消息的过期时间
 //            messageProperties.setExpiration(Expiration);

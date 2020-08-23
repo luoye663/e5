@@ -56,7 +56,7 @@ public class RabbitMQConfig {
     //绑定  将队列和交换机绑定,
     @Bean
     public Binding bindingFanoutQueue1() {
-        return BindingBuilder.bind(fanoutQueue1()).to(customExchangeDelay()).with("delay3").noargs();
+        return BindingBuilder.bind(fanoutQueue1()).to(customExchangeDelay()).with("routing_delay").noargs();
     }
 
 
