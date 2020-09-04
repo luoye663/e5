@@ -11,12 +11,10 @@ import com.google.gson.JsonObject;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
-import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.util.netRequest.OkHttpClientUtil;
 import io.qyi.e5.util.netRequest.OkHttpRequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +35,6 @@ import java.util.Map;
 public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> implements IOutlookService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    IOutlookLogService outlookLogService;
 
     @Value("${outlook.errorMsg}")
     private String[] errorMsg;
@@ -134,12 +130,13 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
 
     /**
      * 删除用户outlook
-    * @Description:
-    * @param: * @param github_id
-    * @return: int
-    * @Author: 落叶随风
-    * @Date: 2020/4/17
-    */
+     *
+     * @Description:
+     * @param: * @param github_id
+     * @return: int
+     * @Author: 落叶随风
+     * @Date: 2020/4/17
+     */
     @Override
     public int deleteInfo(int github_id) {
         QueryWrapper<Outlook> outlookQueryWrapper = new QueryWrapper<>();
@@ -148,42 +145,35 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     }
 
     @Override
-    public boolean getMailList(Outlook outlook) {
-        try {
-            String s = MailList(outlook.getAccessToken());
-            JSONObject json = JSON.parseObject(s);
-            /*错误情况，一般是令牌过期*/
-            if (json.containsKey("error")) {
-                String code = json.getJSONObject("error").getString("code");
-                String message = json.getJSONObject("error").getString("message");
-                /*如果出现得错误是没有message中收集的，那么就认为是无法刷新的情况。比如 用户取消了授权、删除了key*/
-                if (!errorCheck(message)) {
-                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:3", 0, message);
-                    return false;
-                }
-                logger.info("令牌过期!");
-                /*刷新令牌*/
-                String token = refresh_token(outlook);
-                if (token == null) {
-                    return false;
-                }
-                /*再次获取邮件列表*/
-                s = MailList(token);
-                json = JSON.parseObject(s);
-                if (json.containsKey("error")) {
-                    outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌!code:2", 1, json.getJSONObject("error").getString("message"));
-                    return false;
-                }
+    public int getMailList(Outlook outlook) throws Exception {
+        String s = MailList(outlook.getAccessToken());
+        JSONObject json = JSON.parseObject(s);
+        /*错误情况，一般是令牌过期*/
+        if (json.containsKey("error")) {
+            String code = json.getJSONObject("error").getString("code");
+            String message = json.getJSONObject("error").getString("message");
+            /*如果出现的错误是没有message中收集的，那么就认为是无法刷新的情况。比如 用户取消了授权、删除了key*/
+            if (!errorCheck(message)) {
+                throw new Exception("无法刷新令牌!code:3"  + message);
             }
-            logger.info("邮件列表请求成功!" + s);
-            int mail_count = getMailBody(5, s, outlook.getAccessToken());
-            logger.info("读取邮件数量: {}" , mail_count);
-            outlookLogService.addLog(outlook.getGithubId(), "ok", 1, "读取邮件数量:" + mail_count);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            logger.info("令牌过期!");
+            /*刷新令牌*/
+            String token = refresh_token(outlook);
+            if (token == null) {
+                throw new Exception("刷新令牌失败! refresh_token 为空!");
+            }
+            /*再次获取邮件列表*/
+            s = MailList(token);
+            json = JSON.parseObject(s);
+            if (json.containsKey("error")) {
+                throw new Exception("无法刷新令牌!code:2,错误消息: "+ json.getJSONObject("error").getString("message"));
+            }
         }
+        logger.info("邮件列表请求成功!" + s);
+        int mail_count = getMailBody(5, s, outlook.getAccessToken());
+        logger.info("读取邮件数量: {}", mail_count);
+
+        return mail_count;
     }
 
     /**
@@ -233,7 +223,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
 
 
     // 刷新令牌，同时更新数据库中的令牌
-    public String refresh_token(Outlook outlook) {
+    public String refresh_token(Outlook outlook) throws Exception {
         Map<String, Object> head = new HashMap<>();
         head.put("Content-Type", "application/x-www-form-urlencoded");
         Map<String, Object> par = new HashMap<>();
@@ -243,33 +233,24 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         par.put("grant_type", "refresh_token");
         par.put("refresh_token", outlook.getRefreshToken());
         String s = null;
-        try {
-            s = OkHttpClientUtil.doPost("https://login.microsoftonline.com/common/oauth2/v2.0/token", head, par);
-            logger.info("请求刷新列表返回数据：" + s);
-            JSONObject jsonObject = JSON.parseObject(s);
-            if (!jsonObject.containsKey("access_token")) {
-                logger.info("返回的access_token字段不存在");
-                outlookLogService.addLog(outlook.getGithubId(), "无法刷新令牌! 需要重新授权!", 0, s);
-//              字段不存在
-                return null;
-            }
-            outlook.setRefreshToken(jsonObject.getString("refresh_token"));
-            outlook.setAccessToken(jsonObject.getString("access_token"));
-            outlook.setIdToken(jsonObject.getString("id_token"));
-            QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("client_id", outlook.getClientId());
-            if (baseMapper.update(outlook, queryWrapper) != 1) {
-                logger.info("返更新行数不为1");
-                outlookLogService.addLog(outlook.getGithubId(), "更新数据库时发现有重复的key", 0, "");
-                return null;
-            }
-            return outlook.getAccessToken();
-//            更新数据库
-        } catch (Exception e) {
-            e.printStackTrace();
-            outlookLogService.addLog(outlook.getGithubId(), e.getMessage(), 0, e.getMessage());
-            return null;
+        s = OkHttpClientUtil.doPost("https://login.microsoftonline.com/common/oauth2/v2.0/token", head, par);
+        logger.info("请求刷新列表返回数据：" + s);
+        JSONObject jsonObject = JSON.parseObject(s);
+        if (!jsonObject.containsKey("access_token")) {
+            logger.info("返回的access_token字段不存在");
+            throw new Exception("返回的access_token字段不存在,无法刷新令牌! 需要重新授权!");
         }
+        outlook.setRefreshToken(jsonObject.getString("refresh_token"));
+        outlook.setAccessToken(jsonObject.getString("access_token"));
+        outlook.setIdToken(jsonObject.getString("id_token"));
+        QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("client_id", outlook.getClientId());
+        if (baseMapper.update(outlook, queryWrapper) != 1) {
+            logger.info("返更新行数不为1");
+            throw new Exception("更新数据库时发现有重复的key");
+        }
+        return outlook.getAccessToken();
+//            更新数据库
     }
 
     /**

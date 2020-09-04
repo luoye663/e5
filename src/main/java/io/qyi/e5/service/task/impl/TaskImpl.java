@@ -82,11 +82,18 @@ public class TaskImpl implements ITask {
             logger.warn("未找到此用户,github_id: {}", github_id);
             return false;
         }
-        boolean mailList = outlookService.getMailList(Outlook);
-        if (!mailList) {
+        boolean isExecuteE5 ;
+        try {
+            int mail_count = outlookService.getMailList(Outlook);
+            outlookLogService.addLog(github_id, "ok", 1, "读取邮件数量:" + mail_count);
+            isExecuteE5 = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            outlookLogService.addLog(github_id, "error", 0, e.getMessage());
             outlookLogService.addLog(github_id, "error", 0, "检测到错误，下次将不再自动调用，请修正错误后再授权开启续订。" );
+            isExecuteE5 = false;
         }
-        return mailList;
+        return isExecuteE5;
     }
 
     /**
