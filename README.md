@@ -4,7 +4,8 @@
 ## 说明
 此项目为我的新手练手作，代码辣鸡，目前已经从3月份运行到至今。  
 如果要自己搭建的话得自己研究下了，不提供技术支持(懒)，记得修改配置文件 
-src/main/resources/application.properties 内的   
+src/main/resources/application.properties 
+```
 user.admin.githubId  - 自己的github id  
 数据库配置  
 redis配置  
@@ -12,9 +13,9 @@ Rabbit配置
 github.client_id  
 github.client_secret  
 (这两个在https://github.com/settings/developers 申请一个apps就行了。)
-
+```
 ## 注意事项
-由于懒癌发作，在程序启动或者重启，是不会主动把数据库里面的用户加入新队列，所以得手动处理。
+由于懒癌发作，在程序启动或者重启，是不会主动把数据库里面的新用户加入新队列，所以得手动添加。
 1. 在每次启动程序前，先清空延迟队列  
 rabbitmq-plugins disable rabbitmq_delayed_message_exchange
 rabbitmq-plugins enable rabbitmq_delayed_message_exchange  
