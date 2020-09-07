@@ -2,3 +2,4 @@
 /.idea/
 /target/
 /src/main/resources/application-online.properties.bak
+/src/main/resources/application.properties
