@@ -238,7 +238,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         JSONObject jsonObject = JSON.parseObject(s);
         if (!jsonObject.containsKey("access_token")) {
             logger.info("返回的access_token字段不存在");
-            throw new Exception("返回的access_token字段不存在,无法刷新令牌! 需要重新授权!");
+            throw new Exception("返回的access_token字段不存在,无法刷新令牌! 需要重新授权!" );
         }
         outlook.setRefreshToken(jsonObject.getString("refresh_token"));
         outlook.setAccessToken(jsonObject.getString("access_token"));
