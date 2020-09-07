@@ -48,7 +48,7 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         log.info("--------------Token鉴权---------------");
-        /*设置跨域*/
+        /*设置跨域 最好在nginx处设置*/
         HttpServletResponse response = httpServletResponse;
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -57,7 +57,6 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
         /*如果是OPTIONS则结束请求*/
         if (HttpMethod.OPTIONS.toString().equals(httpServletRequest.getMethod())) {
-            log.debug("OPTIONS请求");
             response.setStatus(HttpStatus.NO_CONTENT.value());
         } else {
             filterChain.doFilter(httpServletRequest, response);
