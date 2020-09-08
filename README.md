@@ -15,7 +15,7 @@ github.client_secret
 (这两个在https://github.com/settings/developers 申请一个apps就行了。)
 ```
 ## 注意事项
-由于懒癌发作，在程序启动或者重启，是不会主动把数据库里面的新用户加入队列，所以得手动处理。
+由于懒癌发作，在程序启动或者重启，是不会主动把数据库里面的用户加入队列，所以得手动处理。
 1. 在每次启动程序前，先清空延迟队列  
 rabbitmq-plugins disable rabbitmq_delayed_message_exchange
 rabbitmq-plugins enable rabbitmq_delayed_message_exchange  
