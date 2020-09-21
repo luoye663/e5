@@ -1,9 +1,11 @@
 # E5续订程序
-此项目为该网址的源代码 https://e5.qyi.io/user/login 
+此项目为该网址的源代码(后端) https://e5.qyi.io/user/login 
+(前端) https://github.com/luoye663/E5_vue
 ## 说明
 此项目为我的新手练手作，代码辣鸡，目前已经从3月份运行到至今。  
 如果要自己搭建的话得自己研究下了，不提供技术支持(懒)，记得修改配置文件 
-src/main/resources/application.properties 内的   
+src/main/resources/application.properties 
+```
 user.admin.githubId  - 自己的github id  
 数据库配置  
 redis配置  
@@ -11,9 +13,9 @@ Rabbit配置
 github.client_id  
 github.client_secret  
 (这两个在https://github.com/settings/developers 申请一个apps就行了。)
-
+```
 ## 注意事项
-由于懒癌发作，在程序启动或者重启，是不会主动把数据库里面的新用户加入新队列，所以得手动添加。
+由于懒癌发作，在程序启动或者重启，是不会主动把数据库里面的用户加入队列，所以得手动处理。
 1. 在每次启动程序前，先清空延迟队列  
 rabbitmq-plugins disable rabbitmq_delayed_message_exchange
 rabbitmq-plugins enable rabbitmq_delayed_message_exchange  
@@ -43,3 +45,10 @@ rabbitmq-plugins enable rabbitmq_delayed_message_exchange
 权限配置由于就那么几个，所以就没写到mysql里面。
 ### log4j2
 日志框架
+
+## 鸣谢
+
+> [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。
+
+特别感谢 [JetBrains](https://www.jetbrains.com/?from=) 为开源项目提供免费的 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=) 等 IDE 的授权  
+[<img src=".github/jetbrains-variant-3.png" width="200"/>](https://www.jetbrains.com/)
