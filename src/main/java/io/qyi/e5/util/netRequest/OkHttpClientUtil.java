@@ -18,16 +18,16 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OkHttpClientUtil {
-    private static int connTimeOut = 5;
-    private static int readTimeOut = 20;
-    private static int writeTimeOut = 10;
+    private static int connTimeOut = 5 * 1000;
+    private static int readTimeOut = 20 * 1000;
+    private static int writeTimeOut = 10 * 1000;
     public static OkHttpClient client = null;
 
     static {
         client = new OkHttpClient.Builder()
-                .connectTimeout(5L, TimeUnit.SECONDS)
-                .readTimeout(20L, TimeUnit.SECONDS)
-                .writeTimeout(10L, TimeUnit.SECONDS)
+                .connectTimeout(connTimeOut, TimeUnit.SECONDS)
+                .readTimeout(readTimeOut, TimeUnit.SECONDS)
+                .writeTimeout(writeTimeOut, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
                 .build();
     }
