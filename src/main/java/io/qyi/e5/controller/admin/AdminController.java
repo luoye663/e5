@@ -32,7 +32,7 @@ public class AdminController {
     RedisUtil redisUtil;
 
     @Value("user.admin.githubId")
-    int adminGithubId;
+    String adminGithubId;
 
     /**
      * 测试队列
@@ -42,7 +42,7 @@ public class AdminController {
      */
     @GetMapping("/send")
     public void send() {
-        Task.sendTaskOutlookMQ(adminGithubId);
+        Task.sendTaskOutlookMQ(Integer.valueOf(adminGithubId) );
     }
 
     /**
