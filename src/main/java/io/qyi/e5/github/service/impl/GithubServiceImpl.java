@@ -3,15 +3,14 @@ package io.qyi.e5.github.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.qyi.e5.github.entity.Github;
 import io.qyi.e5.github.entity.UserInfo;
 import io.qyi.e5.github.mapper.GithubMapper;
 import io.qyi.e5.github.service.IGithubService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.qyi.e5.util.StringUtil;
-import io.qyi.e5.util.netRequest.OkHttpRequestUtils;
+import io.qyi.e5.util.netRequest.OkHttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +42,7 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
         head.put("Content-Type", "application/x-www-form-urlencoded");
         String s = null;
         try {
-            s = OkHttpRequestUtils.doPost("https://github.com/login/oauth/access_token", head, par);
+            s = OkHttpClientUtil.doPost("https://github.com/login/oauth/access_token", head, par);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,10 +53,10 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
 
     @Override
     public String getUserEmail(String access_token) throws Exception {
-        Map<String, Object> head = new HashMap<>();
+        Map<String, String> head = new HashMap<>();
         head.put("Authorization", "token " + access_token);
         head.put("Content-Type", "application/vnd.github.machine-man-preview+json");
-        String s = OkHttpRequestUtils.doGet("https://api.github.com/user/emails", head, null);
+        String s = OkHttpClientUtil.doGet("https://api.github.com/user/emails", null,head, null);
         System.out.println(s);
         JSONArray jsonArray = JSON.parseArray(s);
         if (!jsonArray.isEmpty()) {
@@ -74,11 +73,11 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
 
     @Override
     public UserInfo getUserInfo(String access_token)  {
-        Map<String, Object> head = new HashMap<>();
+        Map<String, String> head = new HashMap<>();
         head.put("Authorization", "token " + access_token);
         head.put("Content-Type", "application/vnd.github.machine-man-preview+json");
         try {
-            String s = OkHttpRequestUtils.doGet("https://api.github.com/user", head, null);
+            String s = OkHttpClientUtil.doGet("https://api.github.com/user",null, head, null);
             JSONObject jsonObject = JSON.parseObject(s);
             UserInfo userInfo = new UserInfo();
             if (!jsonObject.isEmpty()) {

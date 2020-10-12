@@ -203,20 +203,20 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             JsonObject mail = value.get(i).getAsJsonObject();
             String id = mail.get("id").getAsString();
 
-            Map<String, Object> head = new HashMap<>();
+            Map<String, String> head = new HashMap<>();
             head.put("Content-Type", "application/json");
             head.put("Authorization", access_token);
             /*不用管邮件内容*/
-            OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages/" + id, head, null);
+            OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages/" + id, null,head, null);
         }
         return count;
     }
 
     public String MailList(String access_token) throws Exception {
-        Map<String, Object> head = new HashMap<>();
+        Map<String, String> head = new HashMap<>();
         head.put("Content-Type", "application/json");
         head.put("Authorization", access_token);
-        String s = OkHttpRequestUtils.doGet("https://graph.microsoft.com/v1.0/me/messages?$select=sender,subject", head, null);
+        String s = OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages?$select=sender,subject",null, head, null);
         logger.debug("请求邮件列表返回数据：" + s);
         return s;
     }
