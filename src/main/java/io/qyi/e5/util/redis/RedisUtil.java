@@ -51,11 +51,12 @@ public class RedisUtil {
 
     /**
      * 删除所有键值对
+     *
+     * @throws
      * @title deleteALl
      * @description
      * @author 落叶随风
      * @updateTime 2020/4/22 22:53
-     * @throws
      */
     public void deleteALL() {
         Set<String> keys = redisTemplate.keys("*");
@@ -581,7 +582,9 @@ public class RedisUtil {
             return 0;
         }
     }
+
     /**
+     * @throws
      * @title lRemove
      * @description
      * @author 落叶随风
@@ -590,11 +593,10 @@ public class RedisUtil {
      * @param: value
      * @updateTime 2020/2/4 14:59
      * @return: long
-     * @throws
      */
     public boolean lTrim(String key, long start, long end) {
         try {
-            redisTemplate.opsForList().trim(key,start,end);
+            redisTemplate.opsForList().trim(key, start, end);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -602,4 +604,12 @@ public class RedisUtil {
         }
     }
 
+    public void reName(String old, String new_key) {
+        redisTemplate.rename(old, new_key);
+    }
+
+    public void delAll() {
+        Set<String> keys = redisTemplate.keys("*");
+        redisTemplate.delete(keys);
+    }
 }
