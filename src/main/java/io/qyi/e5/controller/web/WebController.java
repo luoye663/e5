@@ -6,13 +6,17 @@ import io.qyi.e5.github.service.IGithubService;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.util.ResultUtil;
+import io.qyi.e5.util.StringUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +74,12 @@ public class WebController {
         map.put("github", github);
         return ResultUtil.success(map);
 
+    }
+
+    @RequestMapping("getAnnouncement")
+    public String getAnnouncement() throws IOException {
+        String s = StringUtil.readTxt(ResourceUtils.getFile("classpath:announcement.txt"));
+        return s;
     }
 
 }

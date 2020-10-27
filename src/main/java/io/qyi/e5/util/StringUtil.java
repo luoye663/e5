@@ -1,5 +1,6 @@
 package io.qyi.e5.util;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,5 +24,16 @@ public class StringUtil {
             }
         }
         return map;
+    }
+
+    public static String readTxt(File file) throws IOException {
+        String s = "";
+        InputStreamReader in = new InputStreamReader(new FileInputStream(file),"UTF-8");
+        BufferedReader br = new BufferedReader(in);
+        StringBuffer content = new StringBuffer();
+        while ((s=br.readLine())!=null){
+            content = content.append(s);
+        }
+        return content.toString();
     }
 }

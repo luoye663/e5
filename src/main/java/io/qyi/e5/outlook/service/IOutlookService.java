@@ -21,7 +21,7 @@ public interface IOutlookService extends IService<Outlook> {
 
     boolean saveRandomTime(int github_id,int cron_time,int cron_time_random_start,int cron_time_random_end);
 
-    boolean getMailList(Outlook outlook);
+    int getMailList(Outlook outlook) throws Exception;
 
     List<Outlook> findAll();
 

@@ -36,7 +36,6 @@ public class ListenerImpl {
         System.out.println("消费者1开始处理消息："+System.currentTimeMillis());
         int github_id = Integer.valueOf(new String(message.getBody()));
         boolean b = Task.executeE5(github_id);
-
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
         /*再次进行添加任务*/
         if (b) {
