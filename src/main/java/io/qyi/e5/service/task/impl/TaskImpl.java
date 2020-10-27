@@ -12,6 +12,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,9 @@ public class TaskImpl implements ITask {
 
     @Autowired
     IOutlookLogService outlookLogService;
+
+    @Value("${outlook.error.countMax}")
+    int errorCountMax;
 
     @Override
     @Async
@@ -82,11 +86,34 @@ public class TaskImpl implements ITask {
             logger.warn("未找到此用户,github_id: {}", github_id);
             return false;
         }
-        boolean mailList = outlookService.getMailList(Outlook);
-        if (!mailList) {
-            outlookLogService.addLog(github_id, "error", 0, "检测到错误，下次将不再自动调用，请修正错误后再授权开启续订。" );
+        boolean isExecuteE5 ;
+        String errorKey = "user.mq:" + github_id + ":error";
+        try {
+            int mail_count = outlookService.getMailList(Outlook);
+            outlookLogService.addLog(github_id, "ok", 1, "读取邮件数量:" + mail_count);
+            if (redisUtil.hasKey(errorKey)) {
+                redisUtil.del(errorKey);
+            }
+            isExecuteE5 = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            /*连续错误判断*/
+            if (!redisUtil.hasKey(errorKey)) {
+                redisUtil.set(errorKey, 1);
+                isExecuteE5 = true;
+            } else {
+                int error_count = (int)redisUtil.get(errorKey);
+                if (error_count >= errorCountMax) {
+                    outlookLogService.addLog(github_id, "error", 0, e.getMessage());
+                    outlookLogService.addLog(github_id, "error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
+                    isExecuteE5 = false;
+                } else {
+                    redisUtil.incr(errorKey, 1);
+                    isExecuteE5 = true;
+                }
+            }
         }
-        return mailList;
+        return isExecuteE5;
     }
 
     /**

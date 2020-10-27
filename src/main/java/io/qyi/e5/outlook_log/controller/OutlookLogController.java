@@ -73,7 +73,7 @@ public class OutlookLogController {
     }
 
     @GetMapping("/exec111111")
-    public void s(){
+    public void s() throws Exception {
         List<Outlook> list = outlookService.findAll();
         logger.info(String.valueOf(list.size()));
         for (Outlook outlook :list) {

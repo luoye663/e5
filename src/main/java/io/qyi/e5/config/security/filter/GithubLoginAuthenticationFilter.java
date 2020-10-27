@@ -69,7 +69,6 @@ public class GithubLoginAuthenticationFilter extends AbstractAuthenticationProce
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(code, state);
 //            设置身份认证的详情信息
             this.setDetails(httpServletRequest, authRequest);
-
 //            通过AuthenticationManager调用相应的AuthenticationProvider进行用户认证
             return this.getAuthenticationManager().authenticate(authRequest);
     }
