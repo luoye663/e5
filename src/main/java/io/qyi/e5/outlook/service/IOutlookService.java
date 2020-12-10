@@ -17,13 +17,17 @@ public interface IOutlookService extends IService<Outlook> {
 
     boolean getTokenAndSave(String code,String client_id,String client_secret,String redirect_uri,String grant_type) throws Exception;
 
-    boolean save(String client_id,String client_secret,int github_id);
+    Outlook insertOne(String name, String describe, int github_id);
 
-    boolean saveRandomTime(int github_id,int cron_time,int cron_time_random_start,int cron_time_random_end);
+    boolean save(String client_id, String client_secret, int outlook_id, int github_id);
+
+    boolean saveRandomTime(int github_id, int cron_time, int cron_time_random_start, int cron_time_random_end);
 
     int getMailList(Outlook outlook) throws Exception;
 
     List<Outlook> findAll();
 
     int deleteInfo(int github_id);
+
+    List<Outlook> getOutlooklist(int github_id);
 }

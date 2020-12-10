@@ -12,5 +12,5 @@ import io.qyi.e5.outlook.entity.Outlook;
  * @since 2020-02-24
  */
 public interface OutlookMapper extends BaseMapper<Outlook> {
-
+    Outlook selectOutlookOne(int id, int github_id);
 }
