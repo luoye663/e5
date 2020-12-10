@@ -10,9 +10,9 @@ import io.qyi.e5.github.entity.UserInfo;
 import io.qyi.e5.github.mapper.GithubMapper;
 import io.qyi.e5.github.service.IGithubService;
 import io.qyi.e5.util.StringUtil;
-import io.qyi.e5.util.netRequest.OkHttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import io.qyi.e5.util.netRequest.*;
 
 import java.util.HashMap;
 import java.util.Map;

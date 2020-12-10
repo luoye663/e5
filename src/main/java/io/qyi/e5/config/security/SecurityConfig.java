@@ -73,6 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         /*验证token*/
         http.addFilterBefore(new LinkTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.csrf().disable().apply(githubAuth2AuthenticationConfig);
+//        http.addFilterAt(githubAuth2AuthenticationConfig, UsernamePasswordAuthenticationFilter.class);
         /*添加自定义权限管理器*/
         http.authorizeRequests().anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor());
         /*关闭创建session*/

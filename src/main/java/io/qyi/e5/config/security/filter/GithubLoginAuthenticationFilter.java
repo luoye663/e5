@@ -41,6 +41,7 @@ public class GithubLoginAuthenticationFilter extends AbstractAuthenticationProce
 
     public GithubLoginAuthenticationFilter() {
         super(new AntPathRequestMatcher("/auth2/receive", "GET"));
+
         log.info("注册 LoginAuthenticationFilter");
     }
 
