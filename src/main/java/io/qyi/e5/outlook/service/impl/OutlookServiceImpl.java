@@ -8,16 +8,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.qyi.e5.config.APiCode;
+import io.qyi.e5.config.exception.APIException;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.util.netRequest.OkHttpClientUtil;
-import io.qyi.e5.util.netRequest.OkHttpRequestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -75,35 +78,48 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     }
 
     @Override
-    public boolean save(String client_id, String client_secret, int github_id) {
+    public Outlook insertOne(String name, String describe, int github_id) {
+        if (StringUtils.isBlank(name)) {
+            throw new APIException(APiCode.OUTLOOK_NAME_NOT_NULL);
+        }
+        Outlook outlook = new Outlook();
+        outlook.setName(name);
+        outlook.setDescribes(describe);
+        outlook.setGithubId(github_id);
+        logger.info(outlook.toString());
+        if (baseMapper.insert(outlook) != 1) {
+            throw new APIException(APiCode.OUTLOOK_INSERT_ERROR);
+        }
+        return outlook;
+    }
+
+    @Override
+    public boolean save(String client_id, String client_secret, int outlook_id, int github_id) {
         if (github_id == 0) {
-            return false;
+            throw new APIException(APiCode.OUTLOOK_NAME_NOT_NULL);
+        }
+        if (outlook_id == 0) {
+            throw new APIException("缺少参数!");
         }
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("github_id", github_id)
-                .or().eq("client_id", client_id);
-        Outlook outlook1 = baseMapper.selectOne(queryWrapper);
-//      有数据
-        if (outlook1 != null) {
-            outlook1.setClientId(client_id)
-                    .setClientSecret(client_secret);
+//        HashMap<String, Object> sc = new HashMap<>();
+//        sc.put("github_id", github_id);
+//        sc.put("id", outlook_id);
+//        queryWrapper.allEq(sc);
+        queryWrapper.eq("github_id", github_id).eq("id", outlook_id);
+        /*2020-12-10 mybatis plus问题导致会被截断*/
+//        Outlook outlook1 = baseMapper.selectOne(queryWrapper);
 
-            int i = baseMapper.update(outlook1, queryWrapper);
-            if (i == 1) {
-                return true;
-            }
-        } else {
-            Outlook outlook = new Outlook();
-            outlook.setClientId(client_id)
-                    .setClientSecret(client_secret)
-                    .setGithubId(github_id);
-            int i = baseMapper.insert(outlook);
-            if (i == 1) {
-                return true;
-            }
+        Outlook outlook1 = baseMapper.selectOutlookOne(outlook_id,github_id );
+        if (outlook1 == null) {
+            throw new APIException("未查询到此条记录!");
         }
-
-        return false;
+        outlook1.setClientId(client_id);
+        outlook1.setClientSecret(client_secret);
+        if (baseMapper.update(outlook1, queryWrapper) != 1) {
+            throw new APIException("更新记录失败!");
+        }
+        return true;
     }
 
     @Override
@@ -154,7 +170,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             String message = json.getJSONObject("error").getString("message");
             /*如果出现的错误是没有message中收集的，那么就认为是无法刷新的情况。比如 用户取消了授权、删除了key*/
             if (!errorCheck(message)) {
-                throw new Exception("无法刷新令牌!code:3"  + message);
+                throw new Exception("无法刷新令牌!code:3" + message);
             }
             logger.info("令牌过期!");
             /*刷新令牌*/
@@ -166,7 +182,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             s = MailList(token);
             json = JSON.parseObject(s);
             if (json.containsKey("error")) {
-                throw new Exception("无法刷新令牌!code:2,错误消息: "+ json.getJSONObject("error").getString("message"));
+                throw new Exception("无法刷新令牌!code:2,错误消息: " + json.getJSONObject("error").getString("message"));
             }
         }
         logger.info("邮件列表请求成功!" + s);
@@ -207,7 +223,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             head.put("Content-Type", "application/json");
             head.put("Authorization", access_token);
             /*不用管邮件内容*/
-            OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages/" + id, null,head, null);
+            OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages/" + id, null, head, null);
         }
         return count;
     }
@@ -216,7 +232,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         Map<String, String> head = new HashMap<>();
         head.put("Content-Type", "application/json");
         head.put("Authorization", access_token);
-        String s = OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages?$select=sender,subject",null, head, null);
+        String s = OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages?$select=sender,subject", null, head, null);
         logger.debug("请求邮件列表返回数据：" + s);
         return s;
     }
@@ -238,7 +254,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         JSONObject jsonObject = JSON.parseObject(s);
         if (!jsonObject.containsKey("access_token")) {
             logger.info("返回的access_token字段不存在");
-            throw new Exception("返回的access_token字段不存在,无法刷新令牌! 需要重新授权!" );
+            throw new Exception("返回的access_token字段不存在,无法刷新令牌! 需要重新授权!");
         }
         outlook.setRefreshToken(jsonObject.getString("refresh_token"));
         outlook.setAccessToken(jsonObject.getString("access_token"));
@@ -271,4 +287,12 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
         return false;
     }
+
+    @Override
+    public List<Outlook> getOutlooklist(int github_id) {
+        QueryWrapper<Outlook> qw = new QueryWrapper<Outlook>().eq("github_id", github_id);
+        List<Outlook> outlooks = baseMapper.selectList(qw);
+        return outlooks;
+    }
+
 }

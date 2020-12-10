@@ -88,11 +88,6 @@ public class AdminController {
         return "ok";
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "ok";
-    }
-
     @RequestMapping("setAnnouncement")
     public String setAnnouncement(String text) throws IOException {
         File file = ResourceUtils.getFile("classpath:announcement.txt");
@@ -114,12 +109,10 @@ public class AdminController {
             /*写token信息到redis*/
             Map<String, Object> userInfo_redis = new HashMap<>();
             userInfo_redis.put("github_name", "admin");
-            userInfo_redis.put("github_id", 0000);
+            userInfo_redis.put("github_id", 10000);
             userInfo_redis.put("avatar_url", "https://www.baidu.com");
             userInfo_redis.put("authority", list_Authority);
             redisUtil.hmset(token_ + token, userInfo_redis, tokenExpire);
-
-
 //       创建一个已认证的token
 //            UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(userInfo_redis.get("github_name").toString(),
 //                    userInfo_redis.get("github_name").toString(), (int)userInfo_redis.get("github_name"), token, "user", AuthorityUtils.createAuthorityList(Authority));
