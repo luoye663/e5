@@ -4,8 +4,11 @@ package io.qyi.e5.outlook.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.qyi.e5.bean.result.Result;
 import io.qyi.e5.bean.result.ResultEnum;
+import io.qyi.e5.config.ResultVO;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
+import io.qyi.e5.outlook.bean.OutlookListVo;
 import io.qyi.e5.outlook.bean.OutlookVo;
+import io.qyi.e5.outlook.bean.bo.insertOneBO;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.util.ResultUtil;
@@ -14,6 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -30,14 +37,24 @@ public class OutlookController {
     @Autowired
     IOutlookService outlookService;
 
-    @PostMapping("/save")
-    public Result save(@RequestParam String client_id, @RequestParam String client_secret) {
+    @PostMapping("/insertOne")
+    public ResultVO insertOne(@RequestBody insertOneBO bo) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.save(client_id, client_secret, authentication.getGithub_id())) {
-            return ResultUtil.success();
-        }
-        return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);
+        Outlook outlook = outlookService.insertOne(bo.getName(), bo.getDescribe(), authentication.getGithub_id());
+        OutlookVo vo = new OutlookVo();
+        BeanUtils.copyProperties(outlook, vo);
+        return new ResultVO<>(vo);
     }
+
+    @PostMapping("/save")
+    public ResultVO save(@RequestParam String client_id, @RequestParam String client_secret,@RequestParam int outlook_id) {
+        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        if (outlookService.save(client_id, client_secret, outlook_id, authentication.getGithub_id())) {
+            return new ResultVO<>();
+        }
+        return new ResultVO<>();
+    }
+
 
     @PostMapping("/saveRandomTime")
     public Result saveRandomTime(@RequestParam int cronTime, @RequestParam String crondomTime) {
@@ -86,4 +103,21 @@ public class OutlookController {
         }
         return ResultUtil.success(vo);
     }
+
+
+    @GetMapping("/getOutlookList")
+    public Result getOutlookList() {
+        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        int github_id = authentication.getGithub_id();
+        List<Outlook> outlooklist = outlookService.getOutlooklist(github_id);
+        List<OutlookListVo> vo = new ArrayList<>();
+        outlooklist.forEach(outlook -> {
+            OutlookListVo v = new OutlookListVo();
+            BeanUtils.copyProperties(outlook, v);
+            vo.add(v);
+        });
+        return ResultUtil.success(vo);
+    }
+
+
 }

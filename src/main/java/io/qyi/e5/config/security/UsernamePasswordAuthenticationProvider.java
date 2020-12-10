@@ -62,23 +62,6 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         logger.info("Github 认证: code：{} state：{} Token：", code, state);
         Map<String, Object> userInfo_redis = new HashMap<>();
 
-        /*是否调试模式*/
-        if (isDebug) {
-            List<String> list = new ArrayList<>();
-            list.add("admin");
-            list.add("user");
-            String[] l = list.toArray(new String[list.size()]);
-            String token = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
-            UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken("debugName",
-                    "DebugAvatar", adminGithubId, token, "admin", AuthorityUtils.createAuthorityList(l));
-            authenticationToken1.setDetails(authenticationToken);
-            userInfo_redis.put("github_name", "debug");
-            userInfo_redis.put("github_id", adminGithubId);
-            userInfo_redis.put("avatar_url", "https://www.baidu.com");
-            userInfo_redis.put("authority", list);
-            redisUtil.hmset(token_ + token, userInfo_redis, tokenExpire);
-            return authenticationToken1;
-        }
         if (!redisUtil.hasKey(states + state)) {
             throw new UsernameNotFoundException("status不存在");
 //            return ResultUtil.error(ResultEnum.STATE_HAS_EXPIRED);

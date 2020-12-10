@@ -1,10 +1,10 @@
 package io.qyi.e5.bean.core;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qyi.e5.util.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,8 +25,8 @@ import java.io.PrintWriter;
  * @author: 落叶随风
  * @create: 2020-02-16 01:11
  **/
-@Aspect
-@Component
+//@Aspect
+//@Component
 @Slf4j
 public class WebExceptionAspect {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

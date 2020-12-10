@@ -100,13 +100,13 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.2.0</version>
+            <version>3.4.1</version>
         </dependency>
         <!--Mybatis plus代码生成器-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
-            <version>3.2.0</version>
+            <version>3.4.1</version>
         </dependency>
         <!--添加redis缓存依赖-->
         <dependency>
