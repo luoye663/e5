@@ -2,14 +2,16 @@ package io.qyi.e5.outlook.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author 落叶
@@ -58,6 +60,11 @@ public class Outlook implements Serializable {
      */
     private Integer cronTimeRandomEnd;
 
+    /*名称*/
+    private String name;
+
+    /*描述*/
+    private String describes;
 
 
 }
