@@ -13,7 +13,7 @@ import io.qyi.e5.config.exception.APIException;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
-import io.qyi.e5.util.netRequest.OkHttpClientUtil;
+import io.qyi.e5.util.netRequest.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +98,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         if (github_id == 0) {
             throw new APIException(APiCode.OUTLOOK_NAME_NOT_NULL);
         }
-        if (outlook_id == 0) {
+        if (outlook_id == 0 || StringUtils.isBlank(client_id) || StringUtils.isBlank(client_secret)) {
             throw new APIException("缺少参数!");
         }
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
@@ -110,7 +110,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         /*2020-12-10 mybatis plus问题导致会被截断*/
 //        Outlook outlook1 = baseMapper.selectOne(queryWrapper);
 
-        Outlook outlook1 = baseMapper.selectOutlookOne(outlook_id,github_id );
+        Outlook outlook1 = baseMapper.selectOutlookOne(outlook_id, github_id);
         if (outlook1 == null) {
             throw new APIException("未查询到此条记录!");
         }

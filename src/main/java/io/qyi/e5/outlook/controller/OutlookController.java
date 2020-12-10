@@ -8,6 +8,8 @@ import io.qyi.e5.config.ResultVO;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.bean.OutlookListVo;
 import io.qyi.e5.outlook.bean.OutlookVo;
+import io.qyi.e5.outlook.bean.bo.SaveRandomBo;
+import io.qyi.e5.outlook.bean.bo.UpdateBo;
 import io.qyi.e5.outlook.bean.bo.insertOneBO;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
@@ -47,18 +49,28 @@ public class OutlookController {
     }
 
     @PostMapping("/save")
-    public ResultVO save(@RequestParam String client_id, @RequestParam String client_secret,@RequestParam int outlook_id) {
+    public ResultVO save(@RequestBody UpdateBo bo) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.save(client_id, client_secret, outlook_id, authentication.getGithub_id())) {
+        if (outlookService.save(bo.getClient_id(), bo.getClient_secret(), bo.getOutlook_id(), authentication.getGithub_id())) {
             return new ResultVO<>();
         }
         return new ResultVO<>();
     }
 
-
+    /**
+     * 保存调用时间
+     * @title saveRandomTime
+     * @description
+     * @author 落叶随风
+     * @param: cronTime
+     * @param: crondomTime
+     * @updateTime 2020/12/10 21:49
+     * @return: io.qyi.e5.bean.result.Result
+     * @throws
+     */
     @PostMapping("/saveRandomTime")
-    public Result saveRandomTime(@RequestParam int cronTime, @RequestParam String crondomTime) {
-        String[] split = crondomTime.split("-");
+    public Result saveRandomTime(@RequestBody SaveRandomBo bo) {
+        String[] split = bo.getCrondomTime().split("-");
         if (split.length != 2) {
             return ResultUtil.error(ResultEnum.INVALID_format);
         }
@@ -84,18 +96,19 @@ public class OutlookController {
             return ResultUtil.error(-1, "最大间隔时间为 6 小时");
         }
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.saveRandomTime(authentication.getGithub_id(), cronTime, cron_time_random_start, cron_time_random_end)) {
+        if (outlookService.saveRandomTime(authentication.getGithub_id(), bo.getCronTime(), cron_time_random_start, cron_time_random_end)) {
             return ResultUtil.success();
         }
         return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);
     }
 
     @GetMapping("/getOutlookInfo")
-    public Result getOutlookInfo() {
+    public Result getOutlookInfo(@RequestParam int id) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         int github_id = authentication.getGithub_id();
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", github_id);
+        queryWrapper.eq("id", id);
         Outlook one = outlookService.getOne(queryWrapper);
         OutlookVo vo = new OutlookVo();
         if (one != null) {
