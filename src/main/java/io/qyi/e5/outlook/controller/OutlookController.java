@@ -14,6 +14,7 @@ import io.qyi.e5.outlook.bean.bo.insertOneBO;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.util.ResultUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/outlook/outlook")
+@Slf4j
 public class OutlookController {
 
     @Autowired
@@ -96,7 +98,7 @@ public class OutlookController {
             return ResultUtil.error(-1, "最大间隔时间为 6 小时");
         }
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.saveRandomTime(authentication.getGithub_id(), bo.getCronTime(), cron_time_random_start, cron_time_random_end)) {
+        if (outlookService.saveRandomTime(authentication.getGithub_id(), bo.getCronTime(), bo.getOutlookId(), cron_time_random_start, cron_time_random_end)) {
             return ResultUtil.success();
         }
         return ResultUtil.error(ResultEnum.UNKNOWN_ERROR);
@@ -126,6 +128,7 @@ public class OutlookController {
         List<OutlookListVo> vo = new ArrayList<>();
         outlooklist.forEach(outlook -> {
             OutlookListVo v = new OutlookListVo();
+            log.info(outlook.toString());
             BeanUtils.copyProperties(outlook, v);
             vo.add(v);
         });

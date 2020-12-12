@@ -10,6 +10,7 @@ import lombok.Data;
  **/
 @Data
 public class SaveRandomBo {
+    private int outlookId;
     private int cronTime;
     private String crondomTime;
 }

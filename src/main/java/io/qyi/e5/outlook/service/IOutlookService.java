@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author 落叶
@@ -15,13 +15,13 @@ import java.util.List;
  */
 public interface IOutlookService extends IService<Outlook> {
 
-    boolean getTokenAndSave(String code,String client_id,String client_secret,String redirect_uri,String grant_type) throws Exception;
+    boolean getTokenAndSave(String code, String client_id, String client_secret, String redirect_uri, String grant_type) throws Exception;
 
     Outlook insertOne(String name, String describe, int github_id);
 
     boolean save(String client_id, String client_secret, int outlook_id, int github_id);
 
-    boolean saveRandomTime(int github_id, int cron_time, int cron_time_random_start, int cron_time_random_end);
+    boolean saveRandomTime(int github_id, int cron_time, int outlook_id, int cron_time_random_start, int cron_time_random_end);
 
     int getMailList(Outlook outlook) throws Exception;
 

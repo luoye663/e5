@@ -65,6 +65,12 @@ public class Outlook implements Serializable {
 
     /*描述*/
     private String describes;
-
+    /*步骤*/
+    private Integer step;
+    /**
+     * 随机时间结束
+     * 状态: 1、等待配置 2、暂停 3、运行中 4、封禁 5、已停止(由于调用错误导致的停止)
+     */
+    private Integer status;
 
 }

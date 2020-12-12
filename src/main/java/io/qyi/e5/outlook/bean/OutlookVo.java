@@ -15,4 +15,6 @@ public class OutlookVo {
     private String clientSecret;
     private Integer cronTimeRandomStart;
     private Integer cronTimeRandomEnd;
+    private Integer step;
+    private Integer status;
 }
