@@ -116,6 +116,8 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
         outlook1.setClientId(client_id);
         outlook1.setClientSecret(client_secret);
+        outlook1.setStep(1)
+        .setStatus(8);;
         if (baseMapper.update(outlook1, queryWrapper) != 1) {
             throw new APIException("更新记录失败!");
         }
@@ -123,14 +125,20 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     }
 
     @Override
-    public boolean saveRandomTime(int github_id, int cron_time, int cron_time_random_start, int cron_time_random_end) {
-        if (github_id == 0) {
-            return false;
+    public boolean saveRandomTime(int github_id, int cron_time, int outlook_id ,int cron_time_random_start, int cron_time_random_end) {
+        if (github_id == 0 || outlook_id == 0) {
+            throw new APIException("缺少参数!");
         }
         UpdateWrapper<Outlook> Wrapper = new UpdateWrapper<>();
         Wrapper.eq("github_id", github_id);
+        Wrapper.eq("id", outlook_id);
         Outlook outlook = new Outlook();
-        outlook.setCronTime(cron_time).setCronTimeRandomStart(cron_time_random_start).setCronTimeRandomEnd(cron_time_random_end);
+        outlook.setCronTime(cron_time)
+                .setCronTimeRandomStart(cron_time_random_start)
+                .setCronTimeRandomEnd(cron_time_random_end)
+                .setStep(2)
+                .setStatus(6);
+
         int update = baseMapper.update(outlook, Wrapper);
 //      有数据
         if (update > 0) {
