@@ -117,7 +117,8 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         outlook1.setClientId(client_id);
         outlook1.setClientSecret(client_secret);
         outlook1.setStep(1)
-        .setStatus(8);;
+                .setStatus(8);
+        ;
         if (baseMapper.update(outlook1, queryWrapper) != 1) {
             throw new APIException("更新记录失败!");
         }
@@ -125,7 +126,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     }
 
     @Override
-    public boolean saveRandomTime(int github_id, int cron_time, int outlook_id ,int cron_time_random_start, int cron_time_random_end) {
+    public boolean saveRandomTime(int github_id, int cron_time, int outlook_id, int cron_time_random_start, int cron_time_random_end) {
         if (github_id == 0 || outlook_id == 0) {
             throw new APIException("缺少参数!");
         }
@@ -301,6 +302,31 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         QueryWrapper<Outlook> qw = new QueryWrapper<Outlook>().eq("github_id", github_id);
         List<Outlook> outlooks = baseMapper.selectList(qw);
         return outlooks;
+    }
+    @Override
+    public void setPause(int github_id, int outlookId) {
+        UpdateWrapper<Outlook> up = new UpdateWrapper<>();
+        up.eq("github_id", github_id).eq("id", outlookId);
+        Outlook outlook = baseMapper.selectOne(up);
+        if (outlook == null) {
+            throw new APIException("查无此记录!");
+        }
+        /*只允许运行状态的应用设置暂停*/
+        if (outlook.getStatus() != 2) {
+            throw new APIException("只允许 运行状态 的应用设置暂停!");
+        }
+        if (baseMapper.update(new Outlook().setStatus(2), up) != 1) {
+            throw new APIException("更新失败!");
+        }
+    }
+
+    @Override
+    public void setStart(int github_id, int outlookId) {
+        UpdateWrapper<Outlook> up = new UpdateWrapper<>();
+        up.eq("github_id", github_id).eq("id", outlookId);
+        if (baseMapper.update(new Outlook().setStatus(6), up) != 1) {
+            throw new APIException("更新失败!");
+        }
     }
 
 }
