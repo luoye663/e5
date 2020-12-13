@@ -30,4 +30,8 @@ public interface IOutlookService extends IService<Outlook> {
     int deleteInfo(int github_id);
 
     List<Outlook> getOutlooklist(int github_id);
+
+    void setPause(int github_id, int outlookId);
+
+    void setStart(int github_id, int outlookId);
 }

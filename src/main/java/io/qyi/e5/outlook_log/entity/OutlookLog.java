@@ -31,6 +31,11 @@ public class OutlookLog implements Serializable {
     private Integer githubId;
 
     /**
+     * outlook_id
+     */
+    private Integer outlookId;
+
+    /**
      * 调用时间
      */
     private Integer callTime;

@@ -134,6 +134,27 @@ public class OutlookController {
         });
         return ResultUtil.success(vo);
     }
-
+    /**
+     * 设置状态暂停状态
+     * @title setPause
+     * @description
+     * @author 落叶随风
+     * @param: id outlook id
+     * @updateTime 2020/12/13 19:24
+     * @return: io.qyi.e5.bean.result.Result
+     * @throws
+     */
+    @GetMapping("/setPause")
+    public Result setPause(@RequestParam int id) {
+        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        outlookService.setPause(authentication.getGithub_id(),id);
+        return ResultUtil.success();
+    }
+    @GetMapping("/setStart")
+    public Result setStart(@RequestParam int id) {
+        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        outlookService.setStart(authentication.getGithub_id(),id);
+        return ResultUtil.success();
+    }
 
 }
