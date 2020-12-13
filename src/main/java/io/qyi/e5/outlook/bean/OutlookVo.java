@@ -10,7 +10,6 @@ import lombok.Data;
  **/
 @Data
 public class OutlookVo {
-    private int id;
     private String clientId;
     private String clientSecret;
     private Integer cronTimeRandomStart;
