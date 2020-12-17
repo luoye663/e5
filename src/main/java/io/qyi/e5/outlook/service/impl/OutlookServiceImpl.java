@@ -59,7 +59,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         logger.info("请求access_token返回数据：" + s);
         if (jsonObject.get("error") != null) {
             logger.error("错授权误!");
-            return false;
+            throw new APIException(jsonObject.get("error_description").toString());
         } else {
             int expires_in = jsonObject.getIntValue("expires_in");
             String access_token = jsonObject.getString("access_token");

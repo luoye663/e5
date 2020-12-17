@@ -128,7 +128,6 @@ public class OutlookController {
         List<OutlookListVo> vo = new ArrayList<>();
         outlooklist.forEach(outlook -> {
             OutlookListVo v = new OutlookListVo();
-            log.info(outlook.toString());
             BeanUtils.copyProperties(outlook, v);
             vo.add(v);
         });

@@ -7,10 +7,10 @@ package io.qyi.e5.service.task;
  * @create: 2020-04-16 16:51
  **/
 public interface ITask {
-    void sendTaskOutlookMQ(int github_id);
+    void sendTaskOutlookMQ(int github_id, int outlookId);
 
     void sendTaskOutlookMQALL();
 
-    boolean executeE5(int github_id);
+    boolean executeE5(int github_id,int outlookId);
 
 }

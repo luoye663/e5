@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -53,19 +54,28 @@ public class AdminController {
     @Value("${user.token.expire}")
     private int tokenExpire;
 
+
+
     /**
      * 测试队列
+     *
      * @Author: 落叶随风
      * @Date: 2020/9/7  14:44
      * @Return: * @return: void
      */
     @GetMapping("/send")
-    public void send() {
-        Task.sendTaskOutlookMQ(Integer.valueOf(adminGithubId) );
+    public void send(@RequestParam int githubId, @RequestParam int outlookId) {
+        Task.sendTaskOutlookMQ(githubId, outlookId);
+    }
+
+    @GetMapping("/execute")
+    public void execute(@RequestParam int githubId, @RequestParam int outlookId) {
+        Task.executeE5(githubId, outlookId);
     }
 
     /**
      * 对所有队列重新添加
+     *
      * @Author: 落叶随风
      * @Date: 2020/9/7  14:43
      * @Return: * @return: java.lang.String
@@ -78,6 +88,7 @@ public class AdminController {
 
     /**
      * 清空redis
+     *
      * @Author: 落叶随风
      * @Date: 2020/9/7  14:41
      * @Return: * @return: java.lang.String
