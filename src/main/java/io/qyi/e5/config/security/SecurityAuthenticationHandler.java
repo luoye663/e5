@@ -55,7 +55,7 @@ public class SecurityAuthenticationHandler implements AuthenticationSuccessHandl
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
         PrintWriter writer = httpServletResponse.getWriter();
-        writer.write(gson.toJson(ResultUtil.error(-1, "failed!")));
+        writer.write(gson.toJson(ResultUtil.error(-1, e.getMessage())));
         writer.flush();
     }
 

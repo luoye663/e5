@@ -1,6 +1,7 @@
 package io.qyi.e5.service.task.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.qyi.e5.outlook.bean.OutlookMq;
 import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
@@ -47,8 +48,8 @@ public class TaskImpl implements ITask {
 
     @Override
     @Async
-    public void sendTaskOutlookMQ(int github_id) {
-        Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
+    public void sendTaskOutlookMQ(int github_id, int outlookId) {
+        Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id).eq("id", outlookId));
         if (Outlook == null) {
             logger.warn("未找到此用户,github_id: {}", github_id);
             return;
@@ -56,9 +57,13 @@ public class TaskImpl implements ITask {
         /*根据用户设置生成随机数*/
         int Expiration = getRandom(Outlook.getCronTimeRandomStart(), Outlook.getCronTimeRandomEnd());
         /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
-        if (!redisUtil.hasKey("user.mq:" + github_id)) {
-            redisUtil.set("user.mq:" + github_id, 0, Expiration - 10);
-            send(github_id, Expiration* 1000);
+        String rsKey = "user.mq:" + github_id + ".outlookId:" + outlookId;
+        if (!redisUtil.hasKey(rsKey)) {
+            redisUtil.set(rsKey, 0, Expiration - 10);
+            OutlookMq mq = new OutlookMq(github_id, outlookId);
+            send(mq, Expiration * 1000);
+        } else {
+            logger.info("Key 存在,不执行{}",rsKey);
         }
     }
 
@@ -80,17 +85,17 @@ public class TaskImpl implements ITask {
     }
 
     @Override
-    public boolean executeE5(int github_id) {
-        Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id));
+    public boolean executeE5(int github_id,int outlookId) {
+        Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id).eq("id",outlookId));
         if (Outlook == null) {
             logger.warn("未找到此用户,github_id: {}", github_id);
             return false;
         }
-        boolean isExecuteE5 ;
-        String errorKey = "user.mq:" + github_id + ":error";
+        boolean isExecuteE5;
+        String errorKey = "user.mq:" + github_id + ":outlook.id:" + outlookId + ":error";
         try {
             int mail_count = outlookService.getMailList(Outlook);
-            outlookLogService.addLog(github_id, "ok", 1, "读取邮件数量:" + mail_count);
+            outlookLogService.addLog(github_id,outlookId, "ok", 1, "读取邮件数量:" + mail_count);
             if (redisUtil.hasKey(errorKey)) {
                 redisUtil.del(errorKey);
             }
@@ -102,13 +107,14 @@ public class TaskImpl implements ITask {
                 redisUtil.set(errorKey, 1);
                 isExecuteE5 = true;
             } else {
-                int error_count = (int)redisUtil.get(errorKey);
+                int error_count = (int) redisUtil.get(errorKey);
                 if (error_count >= errorCountMax) {
-                    outlookLogService.addLog(github_id, "error", 0, e.getMessage());
-                    outlookLogService.addLog(github_id, "error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
+                    outlookLogService.addLog(github_id, outlookId,"error", 0, e.getMessage());
+                    outlookLogService.addLog(github_id, outlookId,"error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
                     isExecuteE5 = false;
                 } else {
                     redisUtil.incr(errorKey, 1);
+                    outlookLogService.addLog(github_id, outlookId,"error", 0, e.getMessage());
                     isExecuteE5 = true;
                 }
             }
@@ -133,7 +139,6 @@ public class TaskImpl implements ITask {
             MessageProperties messageProperties = message.getMessageProperties();
             // 设置这条消息的过期时间
 //            messageProperties.setExpiration(Expiration);
-
             messageProperties.setHeader("x-delay", Expiration);
             return message;
         }, correlationData);

@@ -1,6 +1,8 @@
 package io.qyi.e5.service.rabbitMQ.impl;
 
+import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
+import io.qyi.e5.outlook.bean.OutlookMq;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.service.task.ITask;
 import lombok.extern.slf4j.Slf4j;
@@ -29,17 +31,18 @@ public class ListenerImpl {
     @Autowired
     ITask Task;
 
+    private static final Gson gson = new Gson();
+
     @RabbitHandler
     @RabbitListener(queues = "delay_queue1", containerFactory = "rabbitListenerContainerFactory")
     public void listen(Message message, Channel channel) throws IOException {
         log.info("消费者1开始处理消息： {},时间戳:{}" ,message,System.currentTimeMillis());
-        System.out.println("消费者1开始处理消息："+System.currentTimeMillis());
-        int github_id = Integer.valueOf(new String(message.getBody()));
-        boolean b = Task.executeE5(github_id);
+        OutlookMq mq = gson.fromJson(new String(message.getBody()), OutlookMq.class);
+        boolean b = Task.executeE5(mq.getGithubId(),mq.getOutlookId());
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
         /*再次进行添加任务*/
         if (b) {
-            Task.sendTaskOutlookMQ(github_id);
+            Task.sendTaskOutlookMQ(mq.getGithubId(),mq.getOutlookId());
         }
     }
 }

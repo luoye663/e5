@@ -39,14 +39,24 @@ public class AuthController {
     @Autowired
     IOutlookService outlookService;
 
+    @Value("${isdebug}")
+    boolean isDebug;
+
     @Value("${redis.auth2.outlook}")
     String states;
+
+    @Value("${outlook.replyUrl}")
+    String replyUrl;
+
+    @Value("${outlook.replyUrlDebug}")
+    String replyUrlDebug;
 
     @Value("${outlook.authorize.url}")
     String authorizeUrl;
 
     @Autowired
     ITask Task;
+
 
     @RequestMapping("/receive")
     public Result Receive(String code, String state, String session_state) throws Exception {
@@ -55,21 +65,27 @@ public class AuthController {
         }
         /*这里不应该查询，在进行授权时因该把基础数据丢到redis*/
         QueryWrapper<Outlook> outlookQueryWrapper = new QueryWrapper<>();
-        outlookQueryWrapper.eq("github_id", redisUtil.get(states + state));
+        int outlookId = (int) redisUtil.get(states + state);
+        outlookQueryWrapper.eq("id", outlookId);
         Outlook outlook = outlookService.getOne(outlookQueryWrapper);
         /*删除redis中的此键*/
         redisUtil.del(states + state);
         if (outlook == null) {
-            throw new APIException("没有查询到此用户，请检查是否在系统中注册!");
+            throw new APIException("没有查询到此记录，请检查是否在系统中注册!");
         }
-        System.out.println(outlook);
-        boolean authorization_code = outlookService.getTokenAndSave(code, outlook.getClientId(), outlook.getClientSecret(), "https://e5.qyi.io/outlook/auth2/receive"
+        String reUrl = "";
+        if (isDebug) {
+            reUrl = replyUrlDebug;
+        } else {
+            reUrl = replyUrl;
+        }
+        boolean authorization_code = outlookService.getTokenAndSave(code, outlook.getClientId(), outlook.getClientSecret(), reUrl
                 , "authorization_code");
         if (!authorization_code) {
             throw new APIException("clientId 或 clientSecret 填写错误!授权失败!");
         }
         /*添加此用户进消息队列*/
-        Task.sendTaskOutlookMQ(outlook.getGithubId());
+        Task.sendTaskOutlookMQ(outlook.getGithubId(),outlookId);
         return ResultUtil.success();
     }
 
@@ -88,8 +104,15 @@ public class AuthController {
             }
             // 生成随机uuid标识用户
             String state = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
-            redisUtil.set(states + state, outlook.getGithubId(), 600);
-            String url = String.format(authorizeUrl, outlook.getClientId(), "https://e5.qyi.io/outlook/auth2/receive", state);
+            redisUtil.set(states + state, id, 600);
+            String reUrl = "";
+            if (isDebug) {
+                reUrl = replyUrlDebug;
+            } else {
+                reUrl = replyUrl;
+            }
+
+            String url = String.format(authorizeUrl, outlook.getClientId(), reUrl, state);
             return ResultUtil.success(url);
         } else {
             throw new APIException("没有此记录");

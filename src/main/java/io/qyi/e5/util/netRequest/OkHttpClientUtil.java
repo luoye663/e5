@@ -2,6 +2,7 @@ package io.qyi.e5.util.netRequest;
 
 import okhttp3.*;
 
+import javax.net.ssl.X509TrustManager;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -13,11 +14,14 @@ public class OkHttpClientUtil {
     public static OkHttpClient client = null;
 
     static {
+        X509TrustManager manager = SSLSocketClientUtil.getX509TrustManager();
         client = new OkHttpClient.Builder()
                 .connectTimeout(connTimeOut, TimeUnit.SECONDS)
                 .readTimeout(readTimeOut, TimeUnit.SECONDS)
                 .writeTimeout(writeTimeOut, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
+                .sslSocketFactory(SSLSocketClientUtil.getSocketFactory(manager), manager)// 忽略校验
+                .hostnameVerifier(SSLSocketClientUtil.getHostnameVerifier())//忽略校验
                 .build();
     }
 
