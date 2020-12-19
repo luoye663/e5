@@ -20,7 +20,7 @@ public class OutlookListVo {
     /*描述*/
     private String describes;
     /*下次调用时间*/
-    private long nextTime;
+    private Integer nextTime;
     /*运行状态*/
     private int status;
 }

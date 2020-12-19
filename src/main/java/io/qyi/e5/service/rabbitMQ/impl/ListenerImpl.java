@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
 import io.qyi.e5.outlook.bean.OutlookMq;
 import io.qyi.e5.outlook.service.IOutlookService;
+import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.service.task.ITask;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public class ListenerImpl {
     IOutlookService outlookService;
     @Autowired
     ITask Task;
+    @Autowired
+    IOutlookLogService outlookLogService;
 
     private static final Gson gson = new Gson();
 
@@ -42,7 +45,13 @@ public class ListenerImpl {
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
         /*再次进行添加任务*/
         if (b) {
-            Task.sendTaskOutlookMQ(mq.getGithubId(),mq.getOutlookId());
+            if (outlookService.isStatusRun(mq.getGithubId(), mq.getOutlookId())) {
+                Task.sendTaskOutlookMQ(mq.getGithubId(), mq.getOutlookId());
+            } else {
+                outlookLogService.addLog(mq.getGithubId(), mq.getOutlookId(), "error", 0, "检测到手动设置了运行状态，停止调用!");
+            }
+        } else {
+            outlookLogService.addLog(mq.getGithubId(), mq.getOutlookId(), "error", 0, "执行失败,结束调用!");
         }
     }
 }
