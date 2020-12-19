@@ -1,5 +1,5 @@
 # E5续订程序
-此项目为该网址的源代码(后端) https://e5.qyi.io/user/login 
+此项目为该网址的源代码(后端) https://e5.qyi.io/
 (前端) https://github.com/luoye663/e5-html
 ### 2020-12-20
 前端框架更改为Angular,同时支持多应用，每个账户最多支持5个应用。
