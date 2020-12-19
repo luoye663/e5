@@ -73,4 +73,7 @@ public class Outlook implements Serializable {
      */
     private Integer status;
 
+    /*下次调用时间*/
+    private Integer nextTime;
+
 }

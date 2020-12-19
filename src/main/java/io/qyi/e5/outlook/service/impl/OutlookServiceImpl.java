@@ -14,13 +14,14 @@ import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.util.netRequest.*;
+import io.qyi.e5.util.redis.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,8 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     @Value("${outlook.errorMsg}")
     private String[] errorMsg;
 
+    @Autowired
+    RedisUtil redisUtil;
 
     // 2020-03-2 10:38 这里需要进行查询判断数据库是否有内容再进行插入。
     @Override
@@ -69,6 +72,8 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             Outlook outlook = new Outlook();
             outlook.setAccessToken(access_token)
                     .setRefreshToken(refresh_token)
+                    .setStatus(3)
+
                     .setIdToken(id_token);
             UpdateWrapper<Outlook> outlookUpdateWrapper = new UpdateWrapper<>();
             outlookUpdateWrapper.eq("client_id", client_id);
@@ -77,6 +82,15 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
     }
 
+    /*
+     *
+     * @param name: 插入一条新列表
+     * @param describe: 描述
+     * @param github_id:  github_id
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:25
+     * @Return: * @return: io.qyi.e5.outlook.entity.Outlook
+    */
     @Override
     public Outlook insertOne(String name, String describe, int github_id) {
         if (StringUtils.isBlank(name)) {
@@ -92,7 +106,16 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
         return outlook;
     }
-
+    /*
+     * 保存key
+     * @param client_id:
+     * @param client_secret:
+     * @param outlook_id:
+     * @param github_id:
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:24
+     * @Return: * @return: boolean
+    */
     @Override
     public boolean save(String client_id, String client_secret, int outlook_id, int github_id) {
         if (github_id == 0) {
@@ -124,7 +147,17 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
         return true;
     }
-
+    /*
+     * 保存随机调用时间
+     * @param github_id: github_id
+     * @param cron_time: cron_time
+     * @param outlook_id: outlook_id
+     * @param cron_time_random_start: 开始时间
+     * @param cron_time_random_end:  结束时间
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:24
+     * @Return: * @return: boolean
+    */
     @Override
     public boolean saveRandomTime(int github_id, int cron_time, int outlook_id, int cron_time_random_start, int cron_time_random_end) {
         if (github_id == 0 || outlook_id == 0) {
@@ -147,7 +180,12 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
         return false;
     }
-
+    /*
+     * 查询所有列表
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:23
+     * @Return: * @return: java.util.List<io.qyi.e5.outlook.entity.Outlook>
+    */
     @Override
     public List<Outlook> findAll() {
         return baseMapper.selectList(null);
@@ -169,6 +207,13 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         return baseMapper.delete(outlookQueryWrapper);
     }
 
+    /*
+     * 调用邮件列表
+     * @param outlook:
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:22
+     * @Return: * @return: int
+    */
     @Override
     public int getMailList(Outlook outlook) throws Exception {
         String s = MailList(outlook.getAccessToken());
@@ -237,6 +282,15 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         return count;
     }
 
+    /**
+     * @title 获取邮件列表，默认5封
+     * @description
+     * @author 落叶随风
+     * @param: access_token
+     * @updateTime 2020/12/19 21:17
+     * @return: java.lang.String
+     * @throws
+     */
     public String MailList(String access_token) throws Exception {
         Map<String, String> head = new HashMap<>();
         head.put("Content-Type", "application/json");
@@ -297,12 +351,32 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         return false;
     }
 
+    /**
+     * @title 获取本账号下的outlook 应用列表
+     * @description
+     * @author 落叶随风
+     * @param: github_id
+     * @updateTime 2020/12/19 21:16
+     * @return: java.util.List<io.qyi.e5.outlook.entity.Outlook>
+     * @throws
+     */
     @Override
     public List<Outlook> getOutlooklist(int github_id) {
         QueryWrapper<Outlook> qw = new QueryWrapper<Outlook>().eq("github_id", github_id);
         List<Outlook> outlooks = baseMapper.selectList(qw);
         return outlooks;
     }
+
+    /**
+     * 设置暂停状态
+     * @title setPause
+     * @description
+     * @author 落叶随风
+     * @param: github_id
+     * @param: outlookId
+     * @updateTime 2020/12/19 21:16
+     * @throws
+     */
     @Override
     public void setPause(int github_id, int outlookId) {
         UpdateWrapper<Outlook> up = new UpdateWrapper<>();
@@ -312,7 +386,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             throw new APIException("查无此记录!");
         }
         /*只允许运行状态的应用设置暂停*/
-        if (outlook.getStatus() != 2) {
+        if (outlook.getStatus() != 3) {
             throw new APIException("只允许 运行状态 的应用设置暂停!");
         }
         if (baseMapper.update(new Outlook().setStatus(2), up) != 1) {
@@ -320,6 +394,16 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         }
     }
 
+    /**
+     * 设置开始状态
+     * @title setStart
+     * @description
+     * @author 落叶随风
+     * @param: github_id
+     * @param: outlookId
+     * @updateTime 2020/12/19 21:16
+     * @throws
+     */
     @Override
     public void setStart(int github_id, int outlookId) {
         UpdateWrapper<Outlook> up = new UpdateWrapper<>();
@@ -328,5 +412,45 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             throw new APIException("更新失败!");
         }
     }
+    /**
+     *  更新数据
+     * @param github_id:  github_id
+     * @param outlookId: outlookId
+     * @param outlook:  更新的数据
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:29
+     * @Return: * @return: void
+    */
+    @Override
+    public void update(int github_id, int outlookId, Outlook outlook) {
+        UpdateWrapper<Outlook> uw = new UpdateWrapper<>();
+        uw.eq("id", outlookId);
+        uw.eq("github_id", github_id);
+        baseMapper.update(outlook, uw);
+    }
 
+    @Override
+    public void delete(int github_id, int outlookId) {
+        QueryWrapper<Outlook> wp = new QueryWrapper<>();
+        wp.eq("github_id", github_id);
+        wp.eq("id", outlookId);
+        if (baseMapper.delete(wp) != 1) {
+            log.error("删除数据失败! github_id:{github_id} - outlookId:{outlookId}");
+            throw new APIException("删除失败!");
+        }
+    }
+    @Override
+    public boolean isStatusRun(int github_id, int outlookId){
+        QueryWrapper<Outlook> wp = new QueryWrapper<>();
+        wp.eq("github_id", github_id);
+        wp.eq("id", outlookId);
+        Outlook outlook = baseMapper.selectOne(wp);
+        if (outlook != null) {
+            if (outlook.getStatus() == 3) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

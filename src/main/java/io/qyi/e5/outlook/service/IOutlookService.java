@@ -34,4 +34,20 @@ public interface IOutlookService extends IService<Outlook> {
     void setPause(int github_id, int outlookId);
 
     void setStart(int github_id, int outlookId);
+
+    /**
+     * 更新数据
+     *
+     * @param github_id: github_id
+     * @param outlookId: outlookId
+     * @param outlook:   更新的数据
+     * @Author: 落叶随风
+     * @Date: 2020/12/19  21:29
+     * @Return: * @return: void
+     */
+    void update(int github_id, int outlookId, Outlook outlook);
+
+    void delete(int github_id, int outlookId);
+
+    boolean isStatusRun(int github_id, int outlookId);
 }

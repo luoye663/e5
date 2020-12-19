@@ -59,8 +59,11 @@ public class TaskImpl implements ITask {
         /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
         String rsKey = "user.mq:" + github_id + ".outlookId:" + outlookId;
         if (!redisUtil.hasKey(rsKey)) {
-            redisUtil.set(rsKey, 0, Expiration - 10);
+            redisUtil.set(rsKey, (System.currentTimeMillis() / 1000) + Expiration, Expiration - 10);
             OutlookMq mq = new OutlookMq(github_id, outlookId);
+            Outlook ol =  new Outlook();
+            ol.setNextTime((int) ((System.currentTimeMillis() / 1000) + Expiration));
+            outlookService.update(github_id,outlookId,ol);
             send(mq, Expiration * 1000);
         } else {
             logger.info("Key 存在,不执行{}",rsKey);
@@ -111,6 +114,10 @@ public class TaskImpl implements ITask {
                 if (error_count >= errorCountMax) {
                     outlookLogService.addLog(github_id, outlookId,"error", 0, e.getMessage());
                     outlookLogService.addLog(github_id, outlookId,"error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
+                    /*设置状态为停止*/
+                    Outlook outlook = new Outlook();
+                    outlook.setStatus(5);
+                    outlookService.update(github_id,outlookId,outlook);
                     isExecuteE5 = false;
                 } else {
                     redisUtil.incr(errorKey, 1);
