@@ -6,7 +6,7 @@
 ## 说明
 此项目为我的新手练手作，代码辣鸡，目前已经从3月份运行到至今。  
 如果要自己搭建的话得自己研究下了，不提供技术支持(懒)，记得修改配置文件 
-src/main/resources/application.properties 
+src/main/resources/application-online.properties 
 ```
 user.admin.githubId  - 自己的github id  
 数据库配置  
