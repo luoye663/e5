@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.1.RELEASE</version>
+        <version>2.5.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.qyi</groupId>
@@ -135,21 +135,14 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.9</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-&lt;!&ndash;            <version>4.3.9.RELEASE</version>&ndash;&gt;
-        </dependency>-->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-<!--            <version>1.8.9</version>-->
         </dependency>
 
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-<!--            <version>1.8.9</version>-->
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -157,13 +150,20 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-        <!--这个包同时包含了一些其它的包：spring-context、spring-tx、spring-web、spring-messaging、spring-retry、spring-amqp、amqp-client，如果想单纯一点，可以单独引入。-->
+        <!--webflux依赖-->
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!--这个包同时包含了一些其它的包：spring-context、spring-tx、spring-web、spring-messaging、spring-retry、spring-amqp、amqp-client，如果想单纯一点，可以单独引入。-->
+       <!-- <dependency>
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>
-            <!--<version>${version}</version>-->
-        </dependency>
+            &lt;!&ndash;<version>${version}</version>&ndash;&gt;
+        </dependency>-->
     </dependencies>
+
 
     <build>
         <plugins>
