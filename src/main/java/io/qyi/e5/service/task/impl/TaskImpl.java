@@ -7,17 +7,18 @@ import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.service.task.ITask;
 import io.qyi.e5.util.redis.RedisUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
+import java.util.concurrent.Flow;
+import java.util.concurrent.SubmissionPublisher;
 
 /**
  * @program: e5
@@ -26,8 +27,8 @@ import java.util.UUID;
  * @create: 2020-04-16 16:53
  **/
 @Service
-public class TaskImpl implements ITask {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+@Slf4j
+public class TaskImpl implements ITask, Flow.Subscriber<Outlook> {
 
     @Autowired
     IOutlookService outlookService;
@@ -41,32 +42,93 @@ public class TaskImpl implements ITask {
     @Value("${outlook.error.countMax}")
     int errorCountMax;
 
+    private Flow.Subscription subscription;
+
+    private SubmissionPublisher publisher = new SubmissionPublisher<OutlookMq>();
+
+    {
+        publisher.subscribe(this);
+    }
+
+
+
     @Override
-    @Async
-    public void sendTaskOutlookMQ(int github_id, int outlookId) {
+    public void onSubscribe(Flow.Subscription subscription) {
+        log.info("建立订阅关系");
+        this.subscription = subscription;
+        this.subscription.request(10);
+    }
+
+
+    @Override
+    public void onNext(Outlook item) {
+        System.out.println("接收到一个数据" + item);
+        System.out.println("该任务处理完成，再次请求");
+        listen(new OutlookMq(item.getGithubId(), item.getId()));
+        this.subscription.request(1);
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+        log.error("Flow.Subscription.error: \n{}",throwable.getMessage());
+    }
+
+    @Override
+    public void onComplete() {
+        System.out.println("处理完成");
+    }
+
+    @PreDestroy
+    public void close(){
+        log.info("关闭publisher......");
+        publisher.close();
+    }
+
+    /**
+     * 更新下次调用时间
+     * TODO 这一步待删除
+     * @param github_id:
+     * @param outlookId:
+     * @Author: 落叶随风
+     * @Date: 2021/7/26  15:41
+     * @Return: * @return: void
+     */
+    @Override
+    public void updateOutlookExecDateTime(int github_id, int outlookId) {
         Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id).eq("id", outlookId));
         if (Outlook == null) {
-            logger.warn("未找到此用户,github_id: {}", github_id);
+            log.warn("未找到此用户,github_id: {}", github_id);
             return;
         }
         /*根据用户设置生成随机数*/
         int Expiration = getRandom(Outlook.getCronTimeRandomStart(), Outlook.getCronTimeRandomEnd());
+        Outlook ol =  new Outlook();
+        ol.setId(outlookId).setGithubId(github_id);
+        ol.setNextTime((int) ((System.currentTimeMillis() / 1000) + Expiration));
+        outlookService.update(ol);
+
         /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
-        String rsKey = "user.mq:" + github_id + ".outlookId:" + outlookId;
+       /* String rsKey = "user.mq:" + github_id + ".outlookId:" + outlookId;
         if (!redisUtil.hasKey(rsKey)) {
             redisUtil.set(rsKey, (System.currentTimeMillis() / 1000) + Expiration, Expiration - 10);
-            OutlookMq mq = new OutlookMq(github_id, outlookId);
+
             Outlook ol =  new Outlook();
+            ol.setId(outlookId).setGithubId(github_id);
             ol.setNextTime((int) ((System.currentTimeMillis() / 1000) + Expiration));
-            outlookService.update(github_id,outlookId,ol);
-            send(mq, Expiration * 1000);
+            outlookService.update(ol);
+            // send(mq, Expiration * 1000);
         } else {
-            logger.info("Key 存在,不执行{}",rsKey);
-        }
+            log.info("Key 存在,不执行{}",rsKey);
+        }*/
     }
 
+    /**
+     * 将所有outlook账户列表加入队列
+     * @Author: 落叶随风
+     * @Date: 2021/7/26  15:40
+     * @Return: * @return: void
+     */
     @Override
-    @Async
     public void sendTaskOutlookMQALL() {
         List<Outlook> all = outlookService.findAll();
         Iterator<Outlook> iterator = all.iterator();
@@ -77,16 +139,24 @@ public class TaskImpl implements ITask {
             /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
             if (!redisUtil.hasKey("user.mq:" + next.getGithubId())) {
                 redisUtil.set("user.mq:" + next.getGithubId(), 0, Expiration - 10);
-                send(next.getGithubId(), Expiration * 1000);
+                // send(next.getGithubId(), Expiration * 1000);
             }
         }
     }
 
+    /**
+     * 调用一次邮件
+     * @param github_id: github_id
+     * @param outlookId: outlookId
+     * @Author: 落叶随风
+     * @Date: 2021/7/26  15:39
+     * @Return: * @return: boolean
+     */
     @Override
     public boolean executeE5(int github_id,int outlookId) {
         Outlook Outlook = outlookService.getOne(new QueryWrapper<Outlook>().eq("github_id", github_id).eq("id",outlookId));
         if (Outlook == null) {
-            logger.warn("未找到此用户,github_id: {}", github_id);
+            log.warn("未找到此用户,github_id: {}", github_id);
             return false;
         }
         boolean isExecuteE5;
@@ -111,8 +181,8 @@ public class TaskImpl implements ITask {
                     outlookLogService.addLog(github_id, outlookId,"error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
                     /*设置状态为停止*/
                     Outlook outlook = new Outlook();
-                    outlook.setStatus(5);
-                    outlookService.update(github_id,outlookId,outlook);
+                    outlook.setStatus(5).setId(outlookId).setGithubId(github_id);
+                    outlookService.update(outlook);
                     isExecuteE5 = false;
                 } else {
                     redisUtil.incr(errorKey, 1);
@@ -124,26 +194,23 @@ public class TaskImpl implements ITask {
         return isExecuteE5;
     }
 
-    /**
-     * 发送消息到队列
-     *
-     * @param Expiration
-     * @Description:
-     * @param: * @param msg
-     * @return: void
-     * @Author: 落叶随风
-     * @Date: 2020/4/16
-     */
-    public void send(Object msg, int Expiration) {
-        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
+    @Override
+    public void submit(Outlook mq){
+        publisher.submit(mq);
+    }
 
-        rabbitTemplate.convertAndSend("delay", "routing_delay", msg, message -> {
-            MessageProperties messageProperties = message.getMessageProperties();
-            // 设置这条消息的过期时间
-//            messageProperties.setExpiration(Expiration);
-            messageProperties.setHeader("x-delay", Expiration);
-            return message;
-        }, correlationData);
+    public void listen(OutlookMq mq) {
+        boolean b = executeE5(mq.getGithubId(),mq.getOutlookId());
+        /*再次进行添加任务*/
+        if (b) {
+            if (outlookService.isStatusRun(mq.getGithubId(), mq.getOutlookId())) {
+                updateOutlookExecDateTime(mq.getGithubId(), mq.getOutlookId());
+            } else {
+                outlookLogService.addLog(mq.getGithubId(), mq.getOutlookId(), "error", 0, "检测到手动设置了运行状态，停止调用!");
+            }
+        } else {
+            outlookLogService.addLog(mq.getGithubId(), mq.getOutlookId(), "error", 0, "执行失败,结束调用!");
+        }
     }
 
     /**
@@ -161,4 +228,5 @@ public class TaskImpl implements ITask {
         int Expiration = (r.nextInt(end - start + 1) + start);
         return Expiration;
     }
+
 }

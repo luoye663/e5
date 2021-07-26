@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.qyi</groupId>
     <artifactId>e5</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <name>e5</name>
     <description>Demo project for Spring Boot</description>
 
@@ -19,11 +19,22 @@
     </properties>
 
     <dependencies>
+        <!--排除自带的logging-->
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -35,23 +46,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--排除自带的logging-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
-        <!--log4j2-->
-        <dependency>
+        <!-- 引入log4j2依赖 -->
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
+        </dependency>-->
+
         <!--权限管理插件-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -72,7 +73,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.22</version>
+            <optional>true</optional>
         </dependency>
         <!-- commons-lang -->
         <dependency>
@@ -170,6 +171,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

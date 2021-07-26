@@ -27,6 +27,8 @@ public interface IOutlookService extends IService<Outlook> {
 
     List<Outlook> findAll();
 
+    List<Outlook> findRunOutlookList();
+
     int deleteInfo(int github_id);
 
     List<Outlook> getOutlooklist(int github_id);
@@ -45,7 +47,7 @@ public interface IOutlookService extends IService<Outlook> {
      * @Date: 2020/12/19  21:29
      * @Return: * @return: void
      */
-    void update(int github_id, int outlookId, Outlook outlook);
+    void update(Outlook outlook);
 
     void delete(int github_id, int outlookId);
 

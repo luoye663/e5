@@ -25,7 +25,7 @@ import java.util.Iterator;
 public class UrlAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
-        log.info("进入权限判断!");
+        log.debug("进入权限判断!");
         if (collection == null) {
             return;
         }
@@ -36,7 +36,7 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
             ConfigAttribute configAttribute = iterator.next();
             //访问所请求资源所需要的权限
             String needPermission = configAttribute.getAttribute();
-            log.info("访问 " + o.toString() + " 需要的权限是：" + needPermission);
+            log.debug("访问 " + o.toString() + " 需要的权限是：" + needPermission);
             if (needPermission == null) {
                 break;
             }
@@ -44,8 +44,8 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             for (GrantedAuthority ga : authorities) {
                 if (needPermission.equals(ga.getAuthority())) {
-                    log.info("当前角色: " + ga.getAuthority());
-                    log.info("访问 " + o.toString() + " 已授权!");
+                    log.debug("当前角色: " + ga.getAuthority());
+                    log.debug("访问 " + o.toString() + " 已授权!");
                     return;
                 }
             }
