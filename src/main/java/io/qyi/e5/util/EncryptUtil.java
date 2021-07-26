@@ -1,8 +1,6 @@
 package io.qyi.e5.util;
 
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
@@ -10,6 +8,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 public class EncryptUtil {
     public static final String MD5 = "MD5";
@@ -153,7 +152,7 @@ public class EncryptUtil {
     }
 
     private String base64(byte[] res) {
-        return Base64.encode(res);
+        return Base64.getEncoder().encodeToString(res);
     }
 
     /**
@@ -324,7 +323,7 @@ public class EncryptUtil {
      * @return
      */
     public String Base64Encode(String res) {
-        return Base64.encode(res.getBytes());
+        return base64(res.getBytes());
     }
 
     /**
@@ -334,6 +333,6 @@ public class EncryptUtil {
      * @return
      */
     public String Base64Decode(String res) {
-        return new String(Base64.decode(res));
+        return new String(Base64.getDecoder().decode(res));
     }
 }

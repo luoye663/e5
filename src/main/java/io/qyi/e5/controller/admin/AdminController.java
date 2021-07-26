@@ -48,8 +48,6 @@ public class AdminController {
     @Value("${user.token.expire}")
     private int tokenExpire;
 
-
-
     /**
      * 测试队列
      *
@@ -59,7 +57,7 @@ public class AdminController {
      */
     @GetMapping("/send")
     public void send(@RequestParam int githubId, @RequestParam int outlookId) {
-        Task.sendTaskOutlookMQ(githubId, outlookId);
+        Task.updateOutlookExecDateTime(githubId, outlookId);
     }
 
     @GetMapping("/execute")
@@ -67,18 +65,6 @@ public class AdminController {
         Task.executeE5(githubId, outlookId);
     }
 
-    /**
-     * 对所有队列重新添加
-     *
-     * @Author: 落叶随风
-     * @Date: 2020/9/7  14:43
-     * @Return: * @return: java.lang.String
-     */
-    @GetMapping("/sendAll")
-    public String sendAll() {
-        Task.sendTaskOutlookMQALL();
-        return "ok";
-    }
 
     /**
      * 清空redis
@@ -93,6 +79,13 @@ public class AdminController {
         return "ok";
     }
 
+    /**
+     * 设置公告
+     * @param text:
+     * @Author: 落叶随风
+     * @Date: 2021/7/26  15:30
+     * @Return: * @return: java.lang.String
+     */
     @RequestMapping("setAnnouncement")
     public String setAnnouncement(String text) throws IOException {
         File file = ResourceUtils.getFile("classpath:announcement.txt");
@@ -102,6 +95,13 @@ public class AdminController {
         return "ok";
     }
 
+    /**
+     * 通过配置的密码获取管理员token
+     * @param passwd:
+     * @Author: 落叶随风
+     * @Date: 2021/7/26  15:29
+     * @Return: * @return: java.lang.String
+     */
     @RequestMapping("getDebugAdminToken")
     public String getDebugAdminToken(String passwd) {
         if (userAdminDebugPasswd.equals(passwd)) {
@@ -125,5 +125,7 @@ public class AdminController {
         }
         return "la la la";
     }
+
+
 
 }

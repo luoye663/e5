@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,6 +190,13 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         return baseMapper.selectList(null);
     }
 
+    @Override
+    public List<Outlook> findRunOutlookList(){
+        int nowDateTime = (int) (System.currentTimeMillis() / 1000);
+        List<Outlook> outlooks = baseMapper.selectList(new QueryWrapper<Outlook>().eq("status", 3).lt("next_time", nowDateTime));
+        return outlooks;
+    }
+
     /**
      * 删除用户outlook
      *
@@ -342,7 +348,6 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
      * @updateTime 2020/3/5 14:47
      */
     public boolean errorCheck(String msg) {
-        System.out.println(Arrays.toString(errorMsg));
         for (String s : errorMsg) {
             if (msg.indexOf(s) != -1) {
                 return true;
@@ -414,18 +419,16 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     }
     /**
      *  更新数据
-     * @param github_id:  github_id
-     * @param outlookId: outlookId
      * @param outlook:  更新的数据
      * @Author: 落叶随风
      * @Date: 2020/12/19  21:29
      * @Return: * @return: void
     */
     @Override
-    public void update(int github_id, int outlookId, Outlook outlook) {
+    public void update( Outlook outlook) {
         UpdateWrapper<Outlook> uw = new UpdateWrapper<>();
-        uw.eq("id", outlookId);
-        uw.eq("github_id", github_id);
+        uw.eq("id", outlook.getId());
+        uw.eq("github_id", outlook.getGithubId());
         baseMapper.update(outlook, uw);
     }
 

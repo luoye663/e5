@@ -2,8 +2,6 @@ package io.qyi.e5.outlook.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.qyi.e5.bean.result.Result;
-import io.qyi.e5.bean.result.ResultEnum;
-import io.qyi.e5.config.ResultVO;
 import io.qyi.e5.config.exception.APIException;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.entity.Outlook;
@@ -15,13 +13,9 @@ import io.qyi.e5.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 /**
@@ -85,7 +79,7 @@ public class AuthController {
             throw new APIException("clientId 或 clientSecret 填写错误!授权失败!");
         }
         /*添加此用户进消息队列*/
-        Task.sendTaskOutlookMQ(outlook.getGithubId(),outlookId);
+        Task.updateOutlookExecDateTime(outlook.getGithubId(),outlookId);
         return ResultUtil.success();
     }
 

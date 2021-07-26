@@ -44,10 +44,10 @@ public class LinkTokenAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(userInfo.get("github_name") == null ? "" : userInfo.get("github_name").toString(),
                         userInfo.get("avatar_url").toString(), (int) userInfo.get("github_id"),  AuthorityUtils.createAuthorityList(authority));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken1);
-                log.info("完成授权,角色:{}" , Arrays.toString(authority) );
+                log.debug("完成授权,角色:{}" , Arrays.toString(authority) );
             }
         }
-        log.info("--------------Token鉴权---------------");
+        log.debug("--------------Token鉴权---------------");
         /*设置跨域 最好在nginx处设置*/
         HttpServletResponse response = httpServletResponse;
         response.setHeader("Access-Control-Allow-Origin", "*");
