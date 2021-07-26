@@ -1,15 +1,11 @@
 package io.qyi.e5.controller.admin;
 
-import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.service.task.ITask;
 import io.qyi.e5.util.EncryptUtil;
-import io.qyi.e5.util.StringUtil;
 import io.qyi.e5.util.redis.RedisUtil;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,8 +26,6 @@ import java.util.*;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    @Autowired
-    RabbitTemplate rabbitTemplate;
 
     @Autowired
     IOutlookService outlookService;
