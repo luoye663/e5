@@ -28,7 +28,7 @@ import java.util.concurrent.SubmissionPublisher;
  **/
 @Service
 @Slf4j
-public class TaskImpl implements ITask, Flow.Subscriber<Outlook> {
+public class TaskImpl implements ITask {
 
     @Autowired
     IOutlookService outlookService;
@@ -42,47 +42,7 @@ public class TaskImpl implements ITask, Flow.Subscriber<Outlook> {
     @Value("${outlook.error.countMax}")
     int errorCountMax;
 
-    private Flow.Subscription subscription;
 
-    private SubmissionPublisher publisher = new SubmissionPublisher<OutlookMq>();
-
-    {
-        publisher.subscribe(this);
-    }
-
-
-
-    @Override
-    public void onSubscribe(Flow.Subscription subscription) {
-        log.info("建立订阅关系");
-        this.subscription = subscription;
-        this.subscription.request(10);
-    }
-
-
-    @Override
-    public void onNext(Outlook item) {
-        System.out.println("接收到一个数据" + item);
-        System.out.println("该任务处理完成，再次请求");
-        listen(new OutlookMq(item.getGithubId(), item.getId()));
-        this.subscription.request(1);
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        log.error("Flow.Subscription.error: \n{}",throwable.getMessage());
-    }
-
-    @Override
-    public void onComplete() {
-        System.out.println("处理完成");
-    }
-
-    @PreDestroy
-    public void close(){
-        log.info("关闭publisher......");
-        publisher.close();
-    }
 
     /**
      * 更新下次调用时间
@@ -194,11 +154,8 @@ public class TaskImpl implements ITask, Flow.Subscriber<Outlook> {
         return isExecuteE5;
     }
 
-    @Override
-    public void submit(Outlook mq){
-        publisher.submit(mq);
-    }
 
+    @Override
     public void listen(OutlookMq mq) {
         boolean b = executeE5(mq.getGithubId(),mq.getOutlookId());
         /*再次进行添加任务*/
@@ -228,5 +185,6 @@ public class TaskImpl implements ITask, Flow.Subscriber<Outlook> {
         int Expiration = (r.nextInt(end - start + 1) + start);
         return Expiration;
     }
+
 
 }

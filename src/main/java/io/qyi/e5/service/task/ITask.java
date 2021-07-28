@@ -1,5 +1,6 @@
 package io.qyi.e5.service.task;
 
+import io.qyi.e5.outlook.bean.OutlookMq;
 import io.qyi.e5.outlook.entity.Outlook;
 
 /**
@@ -15,5 +16,5 @@ public interface ITask {
 
     boolean executeE5(int github_id,int outlookId);
 
-    void submit(Outlook mq);
+    void listen(OutlookMq mq);
 }

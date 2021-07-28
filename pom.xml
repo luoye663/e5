@@ -152,10 +152,10 @@
             <scope>compile</scope>
         </dependency>
         <!--webflux依赖-->
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
+        </dependency>-->
 
         <!--这个包同时包含了一些其它的包：spring-context、spring-tx、spring-web、spring-messaging、spring-retry、spring-amqp、amqp-client，如果想单纯一点，可以单独引入。-->
        <!-- <dependency>
