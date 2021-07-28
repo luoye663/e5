@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -37,35 +36,35 @@ public class Start {
     IOutlookService outlookService;
 
     @Value("${e5.system.threadPool}")
-    private int poolSize = 10;
+    Integer poolSize;
 
-    private ExecutorService threadPool  = new ThreadPoolExecutor(
-            //指定了线程池中的线程数量，它的数量决定了添加的任务是开辟新的线程去执行，还是放到workQueue任务队列中去；
-            poolSize,
-            //指定了线程池中的最大线程数量，这个参数会根据你使用的workQueue任务队列的类型，决定线程池会开辟的最大线程数量；
-            poolSize,
-            //当线程池中空闲线程数量超过corePoolSize时，多余的线程会在多长时间内被销毁；
-            0,
-            //unit:keepAliveTime的单位
-            TimeUnit.MILLISECONDS,
-            //任务队列，被添加到线程池中，但尚未被执行的任务；它一般分为直接提交队列、有界任务队列、无界任务队列、优先任务队列几种；
-            new LinkedBlockingQueue<>(poolSize), // 有界队列
-            //线程工厂，用于创建线程，一般用默认即可； new CustThreadFactory(),
-            Executors.defaultThreadFactory(),
-            //拒绝策略；当任务太多来不及处理时，如何拒绝任务；
-            new CustRejectedExecutionHandler()
-    );
+    private ExecutorService threadPool;
+
 
     @PostConstruct
     public void init() {
         log.info("清空redis...... ");
         redisUtil.delAll();
-       /* log.info("重新添加队列...... ");
-        Task.sendTaskOutlookMQALL();*/
+        threadPool = new ThreadPoolExecutor(
+                //指定了线程池中的线程数量，它的数量决定了添加的任务是开辟新的线程去执行，还是放到workQueue任务队列中去；
+                poolSize,
+                //指定了线程池中的最大线程数量，这个参数会根据你使用的workQueue任务队列的类型，决定线程池会开辟的最大线程数量；
+                poolSize,
+                //当线程池中空闲线程数量超过corePoolSize时，多余的线程会在多长时间内被销毁；
+                0,
+                //unit:keepAliveTime的单位
+                TimeUnit.MILLISECONDS,
+                //任务队列，被添加到线程池中，但尚未被执行的任务；它一般分为直接提交队列、有界任务队列、无界任务队列、优先任务队列几种；
+                new LinkedBlockingQueue<>(poolSize), // 有界队列
+                //线程工厂，用于创建线程，一般用默认即可； new CustThreadFactory(),
+                Executors.defaultThreadFactory(),
+                //拒绝策略；当任务太多来不及处理时，如何拒绝任务；
+                new CustRejectedExecutionHandler()
+        );
 
     }
 
-    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     private void distributeTask() {
         List<Outlook> runOutlookList = outlookService.findRunOutlookList();
         CountDownLatch cdl = new CountDownLatch(runOutlookList.size());
