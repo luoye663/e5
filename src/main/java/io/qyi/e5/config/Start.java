@@ -79,6 +79,7 @@ public class Start {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        log.info("本轮调用完成!");
     }
 
     /*任务执行*/
