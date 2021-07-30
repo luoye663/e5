@@ -64,7 +64,7 @@ public class Start {
 
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    // @Scheduled(cron = "0 0/1 * * * ? ")
     private void distributeTask() {
         List<Outlook> runOutlookList = outlookService.findRunOutlookList();
         CountDownLatch cdl = new CountDownLatch(runOutlookList.size());
