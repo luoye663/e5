@@ -2,6 +2,11 @@ package io.qyi.e5.outlook_log.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.WriteApi;
+import com.influxdb.client.WriteOptions;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
 import io.qyi.e5.bean.result.Result;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.service.IOutlookService;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +51,15 @@ public class OutlookLogController {
     @Autowired
     IOutlookService outlookService;
 
+    @Autowired
+    InfluxDBClient influxDBClient;
+    @Value("${spring.influx.org:''}")
+    private String org;
+
+    @Value("${spring.influx.bucket:''}")
+    private String bucket;
+
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${page.size}")
@@ -58,7 +73,8 @@ public class OutlookLogController {
 
         QueryWrapper<OutlookLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("github_id", github_id).eq("outlook_id", outlookId).orderByAsc("call_time");
-        List<OutlookLog> list = outlookLogService.list(queryWrapper);
+
+        List<OutlookLog> list = outlookLogService.findAllList(github_id, outlookId);
         Iterator<OutlookLog> iterator = list.iterator();
         List<LogVo> logVo = new LinkedList<>();
         while (iterator.hasNext()) {
@@ -68,6 +84,22 @@ public class OutlookLogController {
             logVo.add(vo);
         }
         return ResultUtil.success(logVo);
+    }
+
+
+    @GetMapping("/save")
+    public String save(){
+        Point point = Point.measurement("e5s")
+                .addTag("githubud", "22121")
+                .addField("call_time", "11111")
+                .addField("call_time2", "222222")
+                .addField("call_time3", "3333333")
+                .time(Instant.now().toEpochMilli(), WritePrecision.MS);
+
+        try (WriteApi writeApi = influxDBClient.getWriteApi()) {
+            writeApi.writePoint(bucket, org, point);
+        }
+        return "ok";
     }
 
 }

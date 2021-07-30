@@ -1,6 +1,8 @@
 package io.qyi.e5.outlook_log.entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -38,7 +40,7 @@ public class OutlookLog implements Serializable {
     /**
      * 调用时间
      */
-    private Integer callTime;
+    private Timestamp callTime;
 
     /**
      * 调用结果
