@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,15 +90,22 @@ public class OutlookLogController {
 
     @GetMapping("/save")
     public String save(){
-        Point point = Point.measurement("e5s")
-                .addTag("githubud", "22121")
-                .addField("call_time", "11111")
-                .addField("call_time2", "222222")
-                .addField("call_time3", "3333333")
-                .time(Instant.now().toEpochMilli(), WritePrecision.MS);
+        ArrayList<Point> arrayList = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            Point point = Point.measurement("e5s")
+                    .addTag("githubud", "22121")
+                    .addField("aaaaaa1", i)
+                    .addField("aaaaaa2", i)
+                    .addField("aaaaaa3", i)
+                    .time(Instant.now().toEpochMilli(), WritePrecision.MS);
+            arrayList.add(point);
+        }
+
+
 
         try (WriteApi writeApi = influxDBClient.getWriteApi()) {
-            writeApi.writePoint(bucket, org, point);
+            // writeApi.writePoint(bucket, org, point);
+            writeApi.writePoints(bucket,org, arrayList);
         }
         return "ok";
     }
