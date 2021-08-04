@@ -3,10 +3,13 @@ package io.qyi.e5.outlook_log.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.QueryApi;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.WriteOptions;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
+import com.influxdb.query.FluxRecord;
+import com.influxdb.query.FluxTable;
 import io.qyi.e5.bean.result.Result;
 import io.qyi.e5.config.security.UsernamePasswordAuthenticationToken;
 import io.qyi.e5.outlook.service.IOutlookService;
@@ -102,12 +105,55 @@ public class OutlookLogController {
         }
 
 
-
         try (WriteApi writeApi = influxDBClient.getWriteApi()) {
             // writeApi.writePoint(bucket, org, point);
             writeApi.writePoints(bucket,org, arrayList);
         }
         return "ok";
+    }
+
+    @GetMapping("/find")
+    public void find(){
+        String flux = "from(bucket:\"e5\") |> range(start: 0)" +
+                "|> filter(fn: (r) => r[\"_measurement\"] == \"e5s\")" +
+                // "|> filter(fn: (r) => r[\"_field\"] == \"aaaaaa1\")" +
+                "|> limit(n: 100)";
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+        List<FluxTable> tables = queryApi.query(flux,org);
+        for (FluxTable fluxTable : tables) {
+            List<FluxRecord> records = fluxTable.getRecords();
+
+            for (FluxRecord fluxRecord : records) {
+                System.out.println(fluxRecord.getField());
+                System.out.println(fluxRecord.getTime() + " ->" + fluxRecord.getValueByKey("_value"));
+            }
+        }
+
+        /*queryApi.query(flux,org,(cancellable, fluxRecord) -> {
+
+            //
+            // The callback to consume a FluxRecord.
+            //
+            // cancelable - object has the cancel method to stop asynchronous query
+            //
+            System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
+
+        }, throwable -> {
+
+            //
+            // The callback to consume any error notification.
+            //
+            System.out.println("Error occurred: " + throwable.getMessage());
+
+        }, () -> {
+            //
+            // The callback to consume a notification about successfully end of stream.
+            //
+            System.out.println("Query completed");
+
+        });*/
+
     }
 
 }
