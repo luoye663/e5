@@ -95,8 +95,9 @@ public class OutlookLogController {
     public String save(){
         ArrayList<Point> arrayList = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            Point point = Point.measurement("e5s")
-                    .addTag("githubud", "22121")
+            OutlookLog outlookLog = new OutlookLog();
+            Point point = Point.measurement(bucket)
+                    .addTag("githubid", "22121")
                     .addField("aaaaaa1", i)
                     .addField("aaaaaa2", i)
                     .addField("aaaaaa3", i)
