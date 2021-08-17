@@ -34,20 +34,20 @@ public class influxdb2Test {
         List<OutlookLog> list = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             OutlookLog outlookLog = new OutlookLog();
-            outlookLog.setResult(0).setMsg(i + "- ok").setOriginalMsg("加入成功").setCallTime(Instant.now());
+            outlookLog.setResult(1).setMsg(i + "- ok").setOriginalMsg("加入成功").setCallTime(Instant.now());
             list.add(outlookLog);
         }
-        OutlookLog outlookLog = new OutlookLog();
-        outlookLog.setResult(0).setMsg(i + "- ok").setOriginalMsg("加入成功").setCallTime(Instant.now());
-        BeanMap.create(outlookLog).getBean();
+
+        BeanMap beanMap = BeanMap.create(list.get(0));
         try (WriteApi writeApi = influxDBClient.getWriteApi(writeOptions)) {
             // writeApi.writeMeasurement();
             // writeApi.writeMeasurements("e5", org ,WritePrecision.NS,list);
             Point point = Point
                     .measurement("githubId_123")
                     .addTag("githubId","123465")
-                    .addFields(fields)
+                    .addFields(beanMap)
                     .time(Instant.now(), WritePrecision.NS);
+            writeApi.writePoint("e5",org,point);
 
         }
         influxDBClient.close();
