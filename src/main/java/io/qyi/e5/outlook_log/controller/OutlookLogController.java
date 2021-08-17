@@ -57,14 +57,13 @@ public class OutlookLogController {
 
     @Autowired
     InfluxDBClient influxDBClient;
+
     @Value("${spring.influx.org:''}")
     private String org;
 
     @Value("${spring.influx.bucket:''}")
     private String bucket;
 
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${page.size}")
     private int pageSize;
@@ -88,73 +87,6 @@ public class OutlookLogController {
             logVo.add(vo);
         }
         return ResultUtil.success(logVo);
-    }
-
-
-    @GetMapping("/save")
-    public String save(){
-        ArrayList<Point> arrayList = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            OutlookLog outlookLog = new OutlookLog();
-            Point point = Point.measurement(bucket)
-                    .addTag("githubid", "22121")
-                    .addField("aaaaaa1", i)
-                    .addField("aaaaaa2", i)
-                    .addField("aaaaaa3", i)
-                    .time(Instant.now().toEpochMilli(), WritePrecision.MS);
-            arrayList.add(point);
-        }
-
-
-        try (WriteApi writeApi = influxDBClient.getWriteApi()) {
-            // writeApi.writePoint(bucket, org, point);
-            writeApi.writePoints(bucket,org, arrayList);
-        }
-        return "ok";
-    }
-
-    @GetMapping("/find")
-    public void find(){
-        String flux = "from(bucket:\"e5\") |> range(start: 0)" +
-                "|> filter(fn: (r) => r[\"_measurement\"] == \"e5s\")" +
-                // "|> filter(fn: (r) => r[\"_field\"] == \"aaaaaa1\")" +
-                "|> limit(n: 100)";
-
-        QueryApi queryApi = influxDBClient.getQueryApi();
-        List<FluxTable> tables = queryApi.query(flux,org);
-        for (FluxTable fluxTable : tables) {
-            List<FluxRecord> records = fluxTable.getRecords();
-
-            for (FluxRecord fluxRecord : records) {
-                System.out.println(fluxRecord.getField());
-                System.out.println(fluxRecord.getTime() + " ->" + fluxRecord.getValueByKey("_value"));
-            }
-        }
-
-        /*queryApi.query(flux,org,(cancellable, fluxRecord) -> {
-
-            //
-            // The callback to consume a FluxRecord.
-            //
-            // cancelable - object has the cancel method to stop asynchronous query
-            //
-            System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
-
-        }, throwable -> {
-
-            //
-            // The callback to consume any error notification.
-            //
-            System.out.println("Error occurred: " + throwable.getMessage());
-
-        }, () -> {
-            //
-            // The callback to consume a notification about successfully end of stream.
-            //
-            System.out.println("Query completed");
-
-        });*/
-
     }
 
 }
