@@ -1,6 +1,8 @@
 package io.qyi.e5.outlook_log.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.InfluxDBClientFactory;
 import io.qyi.e5.outlook_log.entity.OutlookLog;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import org.springframework.stereotype.Service;
@@ -9,7 +11,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author 落叶
@@ -19,8 +21,9 @@ import java.util.List;
 public class OutlookLogServiceImpl implements IOutlookLogService {
 
 
+
     @Override
-    public void addLog(int githubId,int outlookId, String msg, int result,String original_msg) {
+    public void addLog(int githubId, int outlookId, String msg, int result, String original_msg) {
         // OutlookLog outlookLog = new OutlookLog();
         // outlookLog.setGithubId(githubId)
         //         .setOutlookId(outlookId)
@@ -29,6 +32,8 @@ public class OutlookLogServiceImpl implements IOutlookLogService {
         //         .setOriginalMsg(original_msg);
 
         // baseMapper.insert(outlookLog);
+
+
     }
 
     @Override

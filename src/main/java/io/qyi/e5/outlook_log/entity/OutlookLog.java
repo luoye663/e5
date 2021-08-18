@@ -25,18 +25,20 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Measurement(name = "OutlookLog")
-public class OutlookLog implements Serializable {
+public class OutlookLog {
 
     private static final long serialVersionUID = 1L;
     /**
      * github_id
      */
-    // private Integer githubId;
+    @Column(tag = true)
+    private String githubId;
 
     /**
      * outlook_id
      */
-    // private Integer outlookId;
+    @Column(tag = true)
+    private String outlookId;
 
     /**
      * 调用时间
@@ -48,7 +50,7 @@ public class OutlookLog implements Serializable {
      * 调用结果
      */
     @Column
-    private Integer result;
+    private Number resultc;
 
     /**
      * 如果有错误原因则记录
