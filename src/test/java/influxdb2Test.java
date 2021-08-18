@@ -42,12 +42,17 @@ public class influxdb2Test {
         try (WriteApi writeApi = influxDBClient.getWriteApi(writeOptions)) {
             // writeApi.writeMeasurement();
             // writeApi.writeMeasurements("e5", org ,WritePrecision.NS,list);
-            Point point = Point
-                    .measurement("githubId_123")
-                    .addTag("githubId","123465")
-                    .addFields(beanMap)
-                    .time(Instant.now(), WritePrecision.NS);
-            writeApi.writePoint("e5",org,point);
+            List<Point> list1 = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                Point point = Point
+                        .measurement("githubId_123")
+                        .addTag("githubId","123465")
+                        .addFields(beanMap)
+                        .time(Instant.now(), WritePrecision.NS);
+                list1.add(point);
+            }
+
+            writeApi.writePoints("e5",org,list1);
 
         }
         influxDBClient.close();
