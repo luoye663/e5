@@ -17,6 +17,10 @@ public class influxdb2Test {
 
     private String org = "luoye";
 
+    WriteOptions writeOptions = WriteOptions.builder()
+            .batchSize(100)
+            .build();
+
     @Test
     public void save(){
 
@@ -61,23 +65,32 @@ public class influxdb2Test {
     @Test
     public void saveLog(){
         influxDBClient.setLogLevel(LogLevel.BASIC);
-        for (int i = 0; i < 100; i++) {
-            addLog(1002, 37,"error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
+
+        addLog(1002, 37,"error", 0, "检测到3次连续错误，下次将不再自动调用，请修正错误后再授权开启续订。");
+        for (int i = 0; i < 10000; i++) {
+
         }
 
     }
 
     public void addLog(int githubId, int outlookId, String msg, int result, String original_msg) {
+
         try (WriteApi writeApi = influxDBClient.getWriteApi()) {
-            OutlookLog log = new OutlookLog();
-            log.setCallTime(Instant.now())
-                    .setGithubId(String.valueOf(githubId) )
-                    .setOutlookId(String.valueOf(outlookId))
-                    .setMsg(msg)
-                    .setOriginalMsg(original_msg).setResultc(result);
-            writeApi.writeMeasurement("e5",org, WritePrecision.NS, log);
+            List<OutlookLog> list = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                OutlookLog log = new OutlookLog();
+                log.setCallTime(Instant.now())
+                        .setGithubId(String.valueOf(githubId) )
+                        .setOutlookId(String.valueOf(outlookId))
+                        .setMsg(msg)
+                        .setOriginalMsg(original_msg)
+                        .setResultc(result)
+                        .setCallTime(Instant.now());
+                list.add(log);
 
-
+            }
+            writeApi.writeMeasurements("e5",org, WritePrecision.NS, list);
+            influxDBClient.close();
         }
 
     }
@@ -123,17 +136,16 @@ public class influxdb2Test {
         String flux = "from(bucket:\"e5\") |> range(start: 0)" +
                 "|> filter(fn: (r) => r[\"_measurement\"] == \"OutlookLog\")" +
                 "|> filter(fn: (r) => r[\"githubId\"] == \"1002\")" +
-                "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")" +
-                "|> limit(n: 100)";
+                "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")";
         QueryApi queryApi = influxDBClient.getQueryApi();
+        System.out.println(System.currentTimeMillis());
         List<OutlookLog> tables = queryApi.query(flux,org,OutlookLog.class);
+        System.out.println(System.currentTimeMillis());
         for (OutlookLog table : tables) {
             if (table.getMsg() == null) {
                 continue;
             }
-            System.out.println("Msg: " + table.getMsg());
-            System.out.println("OriginalMsg: " + table.getOriginalMsg());
-            System.out.println("---------------");
+            // System.out.println(table);
         }
         System.out.println("tables 大小:" + tables.size());
         influxDBClient.close();
@@ -144,7 +156,7 @@ public class influxdb2Test {
         String flux = "from(bucket:\"e5\") |> range(start: 0)" +
                 "|> filter(fn: (r) => r[\"_measurement\"] == \"OutlookLog\")" +
                 "|> filter(fn: (r) => r[\"githubId\"] == \"1002\")" +
-                "|> limit(n: 100)";
+                "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")" ;
         QueryApi queryApi = influxDBClient.getQueryApi();
          queryApi.query(flux,org,OutlookLog.class,(cancellable, outlookLog) -> {
              if (outlookLog.getMsg() != null) {
