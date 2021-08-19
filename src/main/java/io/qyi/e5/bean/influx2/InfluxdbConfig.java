@@ -17,7 +17,7 @@ public class InfluxdbConfig {
     @Bean
     public InfluxDBClient influxDBClient() {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(influxDBUrl, token.toCharArray());
-        influxDBClient.setLogLevel(LogLevel.BASIC);
+        influxDBClient.setLogLevel(LogLevel.NONE);
         return influxDBClient;
     }
 
