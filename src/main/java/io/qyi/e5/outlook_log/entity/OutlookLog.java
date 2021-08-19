@@ -43,14 +43,14 @@ public class OutlookLog {
     /**
      * 调用时间
      */
-    @Column(timestamp = true)
-    private Instant callTime;
+    @Column
+    private long callTime;
 
     /**
      * 调用结果
      */
     @Column
-    private Number resultc;
+    private Number result;
 
     /**
      * 如果有错误原因则记录

@@ -59,7 +59,7 @@ public class WebController {
     public Result delete(){
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         /*删除数据库信息*/
-        int outlooklog = iOutlookLogService.deleteInfo(authentication.getGithub_id());
+        // int outlooklog = iOutlookLogService.deleteInfo(authentication.getGithub_id());
         int outlook = outlookService.deleteInfo(authentication.getGithub_id());
         int github = GithubService.deleteInfo(authentication.getGithub_id());
         /*删除redis中信息*/
@@ -69,7 +69,7 @@ public class WebController {
         }
         /*返回结果信息*/
         Map<String, Integer> map = new HashMap<>();
-        map.put("outlooklog", outlooklog);
+        // map.put("outlooklog", outlooklog);
         map.put("outlook", outlook);
         map.put("github", github);
         return ResultUtil.success(map);

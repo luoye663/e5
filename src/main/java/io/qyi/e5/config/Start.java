@@ -38,13 +38,17 @@ public class Start {
     @Value("${e5.system.threadPool}")
     Integer poolSize;
 
+    @Value("${isdebug:true}")
+    private boolean isdebug;
+
+
     private ExecutorService threadPool;
 
 
     @PostConstruct
     public void init() {
-        log.info("清空redis...... ");
-        redisUtil.delAll();
+        // log.info("清空redis...... ");
+        // redisUtil.delAll();
         threadPool = new ThreadPoolExecutor(
                 //指定了线程池中的线程数量，它的数量决定了添加的任务是开辟新的线程去执行，还是放到workQueue任务队列中去；
                 poolSize,
@@ -64,8 +68,12 @@ public class Start {
 
     }
 
-    // @Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     private void distributeTask() {
+        if (isdebug) {
+            log.debug("Debug模式，跳过执行");
+            return;
+        }
         List<Outlook> runOutlookList = outlookService.findRunOutlookList();
         CountDownLatch cdl = new CountDownLatch(runOutlookList.size());
 

@@ -15,6 +15,6 @@ import java.util.List;
  */
 public interface IOutlookLogService  {
     void addLog(int githubId,int outlookId, String msg,int result,String original_msg);
-    int deleteInfo(int github_id);
+    // int deleteInfo(int github_id);
     List<OutlookLog> findAllList(int githubId, int outlookId);
 }
