@@ -1,4 +1,4 @@
-package io.qyi.e5.bean.influx2;
+package io.qyi.e5.config.influx2;
 
 import com.influxdb.LogLevel;
 import com.influxdb.client.InfluxDBClient;
