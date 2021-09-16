@@ -15,6 +15,7 @@ import io.qyi.e5.outlook.mapper.OutlookMapper;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.util.netRequest.*;
 import io.qyi.e5.util.redis.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import java.util.Map;
  * @author 落叶
  * @since 2020-02-24
  */
+@Slf4j
 @Service
 public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> implements IOutlookService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -367,6 +369,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
      */
     @Override
     public List<Outlook> getOutlooklist(int github_id) {
+        log.info("测试MOD service");
         QueryWrapper<Outlook> qw = new QueryWrapper<Outlook>().eq("github_id", github_id);
         List<Outlook> outlooks = baseMapper.selectList(qw);
         return outlooks;

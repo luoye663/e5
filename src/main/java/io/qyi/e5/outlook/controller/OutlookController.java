@@ -122,6 +122,10 @@ public class OutlookController {
 
     @GetMapping("/getOutlookList")
     public Result getOutlookList() {
+        log.info("测试MOD");
+        log.debug("测试MOD");
+        log.warn("测试MOD");
+        log.error("测试MOD");
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         int github_id = authentication.getGithub_id();
         List<Outlook> outlooklist = outlookService.getOutlooklist(github_id);

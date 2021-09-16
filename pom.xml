@@ -20,21 +20,23 @@
 
     <dependencies>
         <!--排除自带的logging-->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <exclusions>
+                <!--排除 springboot 默认的 logback 依赖 -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -48,10 +50,10 @@
         </dependency>
 
         <!-- 引入log4j2依赖 -->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>-->
+        </dependency>
 
         <!--权限管理插件-->
         <dependency>
@@ -73,8 +75,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
+
         <!-- commons-lang -->
         <dependency>
             <groupId>commons-lang</groupId>
@@ -181,6 +185,11 @@
             <groupId>com.influxdb</groupId>
             <artifactId>influxdb-client-java</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
 
