@@ -84,6 +84,7 @@
     <loggers>
         <!--过滤掉spring和hibernate的一些无用的debug信息-->
         <logger name="org.springframework" level="INFO"/>
+        <logger name="io.qyi.e5" level="debug"/>
         <logger name="org.mybatis" level="INFO">
             <!-- 添加如下设置，控制台会再打印一次 -->
             <AppenderRef ref="Console"/>

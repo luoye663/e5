@@ -87,6 +87,7 @@ public class Start {
         runOutlookList.forEach(outlook -> {
             threadPool.execute(new task(outlook,cdl));
         });
+
         /*等待线程池内的线程执行完毕*/
         try {
             cdl.await();

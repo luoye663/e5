@@ -59,7 +59,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 //        根据用户Token中的用户名查找用户信息，如果有该用户信息，则验证用户密码是否正确
         String code = authenticationToken.getCode();
         String state = authenticationToken.getState();
-        logger.info("认证: code：{} state：{} Token：{}", code, state, authenticationToken.getToken());
+        logger.debug("认证: code：{} state：{} Token：{}", code, state, authenticationToken.getToken());
         Map<String, Object> userInfo_redis = new HashMap<>();
 
         if (!redisUtil.hasKey(states + state)) {

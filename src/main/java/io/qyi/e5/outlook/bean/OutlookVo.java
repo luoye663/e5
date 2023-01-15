@@ -17,4 +17,6 @@ public class OutlookVo {
     private Integer cronTimeRandomEnd;
     private Integer step;
     private Integer status;
+    private Integer outlookId;
+
 }

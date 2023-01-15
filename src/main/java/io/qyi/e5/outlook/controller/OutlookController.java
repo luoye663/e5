@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
@@ -36,6 +37,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/outlook/outlook")
 @Slf4j
+@Validated
 public class OutlookController {
 
     @Autowired
@@ -51,9 +53,9 @@ public class OutlookController {
     }
 
     @PostMapping("/save")
-    public ResultVO save(@RequestBody UpdateBo bo) {
+    public ResultVO save(@Validated @RequestBody UpdateBo bo) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.save(bo.getClient_id(), bo.getClient_secret(), bo.getOutlook_id(), authentication.getGithub_id())) {
+        if (outlookService.save(bo, authentication.getGithub_id())) {
             return new ResultVO<>();
         }
         return new ResultVO<>();
@@ -122,10 +124,6 @@ public class OutlookController {
 
     @GetMapping("/getOutlookList")
     public Result getOutlookList() {
-        log.info("测试MOD");
-        log.debug("测试MOD");
-        log.warn("测试MOD");
-        log.error("测试MOD");
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         int github_id = authentication.getGithub_id();
         List<Outlook> outlooklist = outlookService.getOutlooklist(github_id);
