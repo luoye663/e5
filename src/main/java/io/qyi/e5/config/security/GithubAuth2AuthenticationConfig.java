@@ -31,7 +31,7 @@ public class GithubAuth2AuthenticationConfig extends SecurityConfigurerAdapter<D
     public void configure(HttpSecurity http) throws Exception {
         GithubLoginAuthenticationFilter authenticationFilter = new GithubLoginAuthenticationFilter();
 
-        log.info("自定义用户认证处理逻辑");
+        log.debug("自定义用户认证处理逻辑");
 //        自定义用户认证处理逻辑时，需要指定AuthenticationManager，否则无法认证
         authenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
 

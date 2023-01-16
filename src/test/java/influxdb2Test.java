@@ -55,7 +55,6 @@ public class influxdb2Test {
                         .addFields(beanMap);
                 list1.add(point);
             });
-            System.out.println("list 大小:" + list1.size());
             Map<String, Object> aa = new HashMap<>();
             aa.put("a1", 1);
             writeApi.writePoint("e5", org, list1.get(0));
@@ -125,9 +124,7 @@ public class influxdb2Test {
 
             for (FluxRecord fluxRecord : records) {
                 // System.out.println(fluxRecord.getField());
-                System.out.println(fluxRecord.getField() + " ->" + fluxRecord.getValueByKey("_value"));
             }
-            System.out.println("------------------------------------------");
         }
         influxDBClient.close();
     }
@@ -140,16 +137,13 @@ public class influxdb2Test {
                 "|> filter(fn: (r) => r[\"outlookId\"] == \"38\")" +
                 "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")";
         QueryApi queryApi = influxDBClient.getQueryApi();
-        System.out.println(System.currentTimeMillis());
         List<OutlookLog> tables = queryApi.query(flux, org, OutlookLog.class);
-        System.out.println(System.currentTimeMillis());
         for (OutlookLog table : tables) {
             if (table.getMsg() == null) {
                 continue;
             }
             // System.out.println(table);
         }
-        System.out.println("tables 大小:" + tables.size());
         influxDBClient.close();
     }
 
@@ -163,11 +157,9 @@ public class influxdb2Test {
         QueryApi queryApi = influxDBClient.getQueryApi();
         queryApi.query(flux, org, OutlookLog.class, (cancellable, outlookLog) -> {
             if (outlookLog.getMsg() != null) {
-                System.out.println(outlookLog);
             }
 
         });
-        System.out.println("查询完成");
         Thread.sleep(5_000);
         influxDBClient.close();
     }

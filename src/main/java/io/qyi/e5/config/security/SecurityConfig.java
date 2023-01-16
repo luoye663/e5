@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         System.out.println("HttpSecurity http");
 
         /*自定义*/
-        log.info("注册gituhb授权登录");
+        log.debug("注册gituhb授权登录");
 //        http.authorizeRequests().antMatchers("/user/login", "/user/loginFrom", "/auth2/getGithubUrl").permitAll()// 指定相应的请求 不需要验证
 ////                .and()
 ////                .authorizeRequests().antMatchers("/quartz/**").permitAll()//测试
@@ -89,7 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new ObjectPostProcessor<FilterSecurityInterceptor>() {
             @Override
             public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-                log.info("加载自定义url权限");
+                log.debug("加载自定义url权限");
                 object.setAccessDecisionManager(myAccessDecisionManager);
                 object.setSecurityMetadataSource(myInvocationSecurityMetadataSourceService);
                 return object;

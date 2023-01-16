@@ -17,7 +17,6 @@ public class StringUtil {
         for (int i = 0; i < split.length; i++) {
             String[] split1 = split[i].split("=");
             if (split1.length > 1) {
-                System.out.println(split1[0] + " --- " + split1[1]);
                 map.put(split1[0], split1[1]);
             } else {
                 map.put(split1[0], "");

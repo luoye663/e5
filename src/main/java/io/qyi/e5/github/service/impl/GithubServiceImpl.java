@@ -46,7 +46,6 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(s);
         Map<String, String> map = StringUtil.ParsingUrl(s);
         return map.get("access_token");
     }
@@ -57,7 +56,6 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
         head.put("Authorization", "token " + access_token);
         head.put("Content-Type", "application/vnd.github.machine-man-preview+json");
         String s = OkHttpClientUtil.doGet("https://api.github.com/user/emails", null,head, null);
-        System.out.println(s);
         JSONArray jsonArray = JSON.parseArray(s);
         if (!jsonArray.isEmpty()) {
             for (int i = 0; i < jsonArray.size(); i++) {

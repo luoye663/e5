@@ -94,7 +94,7 @@ public class Start {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        log.info("本轮调用完成!");
+        log.debug("本轮调用完成!");
     }
 
     /*任务执行*/
@@ -108,7 +108,7 @@ public class Start {
         @SneakyThrows
         @Override
         public void run() {
-            System.out.println("消费数据: " + value);
+            // System.out.println("消费数据: " + value);
             Task.listen(new OutlookMq(value.getGithubId(), value.getId()));
             this.cdl.countDown();
         }

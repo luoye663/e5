@@ -61,7 +61,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         par.put("grant_type", grant_type);
         String s = OkHttpClientUtil.doPost("https://login.microsoftonline.com/" + tenantId + "/oauth2/v2.0/token", head, par);
         JSONObject jsonObject = JSON.parseObject(s);
-        logger.info("请求access_token返回数据：" + s);
+        logger.debug("请求access_token返回数据：" + s);
         if (jsonObject.get("error") != null) {
             logger.error("错授权误!");
             throw new APIException(jsonObject.get("error_description").toString());
@@ -102,7 +102,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         outlook.setName(name);
         outlook.setDescribes(describe);
         outlook.setGithubId(github_id);
-        logger.info(outlook.toString());
+        logger.debug(outlook.toString());
         if (baseMapper.insert(outlook) != 1) {
             throw new APIException(APiCode.OUTLOOK_INSERT_ERROR);
         }
@@ -233,7 +233,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             if (!errorCheck(message)) {
                 throw new Exception("无法刷新令牌!code:3" + message);
             }
-            logger.info("令牌过期!");
+            logger.debug("令牌过期!");
             /*刷新令牌*/
             String token = refresh_token(outlook);
             if (token == null) {
@@ -320,10 +320,10 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         par.put("refresh_token", outlook.getRefreshToken());
         String s = null;
         s = OkHttpClientUtil.doPost("https://login.microsoftonline.com/" + outlook.getTenantId() + "/oauth2/v2.0/token", head, par);
-        logger.info("请求刷新列表返回数据：" + s);
+        logger.debug("请求刷新列表返回数据：" + s);
         JSONObject jsonObject = JSON.parseObject(s);
         if (!jsonObject.containsKey("access_token")) {
-            logger.info("返回的access_token字段不存在");
+            logger.debug("返回的access_token字段不存在");
             throw new Exception("返回的access_token字段不存在,无法刷新令牌! 需要重新授权!");
         }
         outlook.setRefreshToken(jsonObject.getString("refresh_token"));
@@ -332,7 +332,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("client_id", outlook.getClientId());
         if (baseMapper.update(outlook, queryWrapper) != 1) {
-            logger.info("返更新行数不为1");
+            logger.debug("返更新行数不为1");
             throw new Exception("更新数据库时发现有重复的key");
         }
         return outlook.getAccessToken();
