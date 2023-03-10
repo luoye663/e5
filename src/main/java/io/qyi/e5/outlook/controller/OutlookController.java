@@ -84,7 +84,7 @@ public class OutlookController {
             cron_time_random_start = Integer.valueOf(split[0]);
             cron_time_random_end = Integer.valueOf(split[1]);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return ResultUtil.error(ResultEnum.INVALID_format);
         }
         if (cron_time_random_start > cron_time_random_end) {
@@ -167,6 +167,12 @@ public class OutlookController {
         outlookService.setStart(authentication.getGithub_id(),id);
         return ResultUtil.success();
     }
+
+    /**
+     * 临时屏蔽 delete请求
+     * @param id
+     * @return
+     */
     @GetMapping("/delete")
     public Result delete(@RequestParam int id) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

@@ -63,7 +63,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         JSONObject jsonObject = JSON.parseObject(s);
         logger.debug("请求access_token返回数据：" + s);
         if (jsonObject.get("error") != null) {
-            logger.error("错授权误!");
+            logger.debug("错授权误!");
             throw new APIException(jsonObject.get("error_description").toString());
         } else {
             int expires_in = jsonObject.getIntValue("expires_in");
@@ -318,8 +318,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         par.put("client_secret", outlook.getClientSecret());
         par.put("grant_type", "refresh_token");
         par.put("refresh_token", outlook.getRefreshToken());
-        String s = null;
-        s = OkHttpClientUtil.doPost("https://login.microsoftonline.com/" + outlook.getTenantId() + "/oauth2/v2.0/token", head, par);
+        String s = OkHttpClientUtil.doPost("https://login.microsoftonline.com/" + outlook.getTenantId() + "/oauth2/v2.0/token", head, par);
         logger.debug("请求刷新列表返回数据：" + s);
         JSONObject jsonObject = JSON.parseObject(s);
         if (!jsonObject.containsKey("access_token")) {
@@ -331,10 +330,14 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         outlook.setIdToken(jsonObject.getString("id_token"));
         QueryWrapper<Outlook> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("client_id", outlook.getClientId());
-        if (baseMapper.update(outlook, queryWrapper) != 1) {
+        int update = baseMapper.update(outlook, queryWrapper);
+        if (update > 1) {
             logger.debug("返更新行数不为1");
             throw new Exception("更新数据库时发现有重复的key");
+        } else if (update < 1) {
+            throw new Exception("调用成功，但更新状态失败。");
         }
+
         return outlook.getAccessToken();
 //            更新数据库
     }
@@ -442,10 +445,12 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         QueryWrapper<Outlook> wp = new QueryWrapper<>();
         wp.eq("github_id", github_id);
         wp.eq("id", outlookId);
-        if (baseMapper.delete(wp) != 1) {
-            log.error("删除数据失败! github_id:{github_id} - outlookId:{outlookId}");
+        int delete = baseMapper.delete(wp);
+        if (delete != 1) {
             throw new APIException("删除失败!");
         }
+
+        log.error("删除数据失败! github_id:{} - outlookId:{} - 删除结果: {}", github_id, outlookId, delete);
     }
 
     @Override

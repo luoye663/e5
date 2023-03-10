@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.qyi.e5.config.exception.APIException;
 import io.qyi.e5.github.entity.Github;
 import io.qyi.e5.github.entity.UserInfo;
 import io.qyi.e5.github.mapper.GithubMapper;
@@ -40,11 +41,12 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
         par.put("code", code);
         Map<String, Object> head = new HashMap<>();
         head.put("Content-Type", "application/x-www-form-urlencoded");
-        String s = null;
+        String s;
         try {
             s = OkHttpClientUtil.doPost("https://github.com/login/oauth/access_token", head, par);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            throw new APIException(e.getMessage());
         }
         Map<String, String> map = StringUtil.ParsingUrl(s);
         return map.get("access_token");
@@ -87,9 +89,9 @@ public class GithubServiceImpl extends ServiceImpl<GithubMapper, Github> impleme
             }
             return userInfo;
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            throw new APIException("请求GITHUB用户信息失败!");
         }
-        return null;
     }
 
     @Override

@@ -125,7 +125,6 @@ public class TaskImpl implements ITask {
             }
             isExecuteE5 = true;
         } catch (Exception e) {
-            e.printStackTrace();
             /*连续错误判断*/
             if (!redisUtil.hasKey(errorKey)) {
                 redisUtil.set(errorKey, 1);
