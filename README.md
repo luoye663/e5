@@ -50,6 +50,10 @@ github.client_secret
 ### log4j2
 日志框架
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=luoye663/e5&type=Date)](https://star-history.com/#luoye663/e5&Date)
+
 ## 鸣谢
 
 > [IntelliJ IDEA](https://www.jetbrains.com/zh-cn/idea/buy/#personal?billing=yearly) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。
