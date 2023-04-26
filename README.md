@@ -1,6 +1,31 @@
-# E5续订程序
-此项目为该网址的源代码(后端) https://e5.qyi.io/
-(前端) https://github.com/luoye663/e5-html
+# E5续订程序Docker-Compose版本
+
+使用教程：
+- `git clone`拉取本项目的地址
+- 安装好docker环境
+- 配置环境变量  
+    - 准备好自己的服务器的域名，证书！否则只能本地运行了
+    - 然后配置nginx，把`https://<your-domain.com>`映射到4200端口
+    - 端口不满意自己改docker-compose文件，我就不多说了
+    - 由于微软的回调https是强制要求的，所以必须要有域名、整数，把443的https访问代理到本机的4200端口，具体有很多教程的或者问GPT
+    - 前往Github增加自己的OAUTH APP，配置回调为`https://<your-domain.com>/auth2/receive`，记录client secret什么的信息
+    - 在config.env里面设置自己的Github OAUTH APP的clientID和client secret
+    - OUTLOOK_REPLYURL配置为：`https://<your-domain.com>/outlook/auth2/%s/receive`
+    - 搜索`[[[!!!changeIt!!!]]]`相关的，确保都已经被修改好了！然后执行下一步
+- `docker compose up -d` 启动集群
+- 如果觉得不安全的，默认密码想要改的，搜索默认的密码关键字，修改即可。或者关闭相关的数据库服务器端口。
+- 使用本项目因为自行的配置失误或者其他原因造成的损失，由使用者自行负责。使用本项目代表您同意此条目。
+
+
+
+#### 原作者介绍
+此项目为该网址的源代码
+
+- (后端) https://e5.qyi.io/
+
+- (前端) https://github.com/luoye663/e5-html
+
+
 #### 使用教程
 https://qyi.io/archives/687.html
 

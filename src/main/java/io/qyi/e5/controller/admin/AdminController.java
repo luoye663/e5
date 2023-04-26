@@ -1,8 +1,11 @@
 package io.qyi.e5.controller.admin;
 
+import io.qyi.e5.bean.result.Result;
 import io.qyi.e5.outlook.service.IOutlookService;
+import io.qyi.e5.service.ExecutorPoolService;
 import io.qyi.e5.service.task.ITask;
 import io.qyi.e5.util.EncryptUtil;
+import io.qyi.e5.util.ResultUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @program: 此类里大多都是测试
@@ -47,6 +53,9 @@ public class AdminController {
 
     @Value("${user.token.expire}")
     private int tokenExpire;
+
+    @Resource
+    ExecutorPoolService poolService;
 
     /**
      * 测试队列
@@ -127,5 +136,36 @@ public class AdminController {
     }
 
 
+    /**
+     * 查询线程池状态
+     * @return
+     */
+    @GetMapping("/findPoolStatus")
+    public Result findPoolStatus() {
+        ExecutorService threadPool = poolService.getThreadPool();
+
+        int activeCount = ((ThreadPoolExecutor) threadPool).getActiveCount();
+
+        long completeTaskCount = ((ThreadPoolExecutor) threadPool).getCompletedTaskCount();
+
+        int poolSize = ((ThreadPoolExecutor) threadPool).getPoolSize();
+
+        long taskCount = ((ThreadPoolExecutor) threadPool).getTaskCount();
+
+        long largestPoolSize = ((ThreadPoolExecutor) threadPool).getLargestPoolSize();
+
+        long maximumPoolSize = ((ThreadPoolExecutor) threadPool).getMaximumPoolSize();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("活动线程数", activeCount);
+        map.put("执行完成的任务数", completeTaskCount);
+        map.put("核心线程数", poolSize);
+        map.put("线程池中的任务总量", taskCount);
+        map.put("过去执行过的最多的任务数", largestPoolSize);
+        map.put("线程池最大线程数", maximumPoolSize);
+
+        return ResultUtil.success(map);
+
+    }
 
 }

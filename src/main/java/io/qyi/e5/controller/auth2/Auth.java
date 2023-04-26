@@ -37,11 +37,21 @@ public class Auth {
     String client_id;
 
 
+    @Value("${github.replyUrl}")
+    String replyUrl;
+
+    @Value("${github.replyUrlDebug}")
+    String replyUrlDebug;
+
+    @Value("${isdebug}")
+    boolean isdebug;
+
+
     @RequestMapping("/getGithubUrl")
     public Result getGithubUrl() {
         String state = EncryptUtil.getInstance().SHA1Hex(UUID.randomUUID().toString());
         redisUtil.set(states + state, true, 600);
-        return ResultUtil.success("https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=https://e5.qyi.io/auth2/receive&state=" + state);
+        return ResultUtil.success("https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=" + (isdebug ? replyUrlDebug : replyUrl) + "&state=" + state);
     }
 
    /* @RequestMapping("/receive")

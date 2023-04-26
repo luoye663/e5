@@ -29,7 +29,7 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
         if (collection == null) {
             return;
         }
-        log.info("object is a URL. {}", o.toString());
+        log.debug("object is a URL. {}", o.toString());
         //所请求的资源拥有的权限(一个资源对多个权限)
         Iterator<ConfigAttribute> iterator = collection.iterator();
         while (iterator.hasNext()) {
@@ -56,13 +56,13 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
 
     @Override
     public boolean supports(ConfigAttribute configAttribute) {
-        log.info("进入权限判断! ConfigAttribute configAttribute");
+        log.debug("进入权限判断! ConfigAttribute configAttribute");
         return true;
     }
 
     @Override
     public boolean supports(Class<?> aClass) {
-        log.info("进入权限判断! Class<?> aClass");
+        log.debug("进入权限判断! Class<?> aClass");
         return true;
     }
 }

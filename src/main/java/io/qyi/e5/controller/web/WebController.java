@@ -6,16 +6,18 @@ import io.qyi.e5.github.service.IGithubService;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.util.ResultUtil;
+import io.qyi.e5.util.SecurityUtils;
 import io.qyi.e5.util.StringUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +42,18 @@ public class WebController {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Value("${outlook.replyUrl}")
+    String replyUrl;
+
+    @Value("${outlook.replyUrlDebug}")
+    String replyUrlDebug;
+
+    @Value("${outlook.authorize.url}")
+    String authorizeUrl;
+
+    @Value("${isdebug}")
+    boolean isDebug;
 
     @RequestMapping("/")
     public Result index() {
@@ -80,6 +94,19 @@ public class WebController {
     public String getAnnouncement() throws IOException {
         String s = StringUtil.readTxt(ResourceUtils.getFile("classpath:announcement.txt"));
         return s;
+    }
+
+    @RequestMapping("getUserReplyUrlToOutlook")
+    public Result getUserReplyUrlToOutlook() {
+        String userIdMd5 = DigestUtils.md5DigestAsHex(String.valueOf(SecurityUtils.getUserInfo().getGithub_id()).getBytes());
+
+        String reUrl;
+        if (isDebug) {
+            reUrl = String.format(replyUrlDebug, userIdMd5);
+        } else {
+            reUrl = String.format(replyUrl, userIdMd5);
+        }
+        return ResultUtil.success(reUrl);
     }
 
 }

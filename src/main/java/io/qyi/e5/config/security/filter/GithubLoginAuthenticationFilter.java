@@ -49,7 +49,7 @@ public class GithubLoginAuthenticationFilter extends AbstractAuthenticationProce
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-        log.info("接收github回调参数!");
+        log.debug("接收github回调参数!");
         /*if (!httpServletRequest.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException("不支持该验证方法: " + httpServletRequest.getMethod());
         } else {

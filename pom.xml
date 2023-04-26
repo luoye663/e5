@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.qyi</groupId>
     <artifactId>e5</artifactId>
-    <version>1.0.8</version>
+    <version>1.1.0</version>
     <name>e5</name>
     <description>Demo project for Spring Boot</description>
 
@@ -20,21 +20,23 @@
 
     <dependencies>
         <!--排除自带的logging-->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <exclusions>
+                <!--排除 springboot 默认的 logback 依赖 -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -48,10 +50,10 @@
         </dependency>
 
         <!-- 引入log4j2依赖 -->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>-->
+        </dependency>
 
         <!--权限管理插件-->
         <dependency>
@@ -73,8 +75,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
+
         <!-- commons-lang -->
         <dependency>
             <groupId>commons-lang</groupId>
@@ -183,6 +187,16 @@
             <version>3.1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <!-- 自定义验证注解 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
 
 
         <!--webflux依赖-->
@@ -192,11 +206,11 @@
         </dependency>-->
 
         <!--这个包同时包含了一些其它的包：spring-context、spring-tx、spring-web、spring-messaging、spring-retry、spring-amqp、amqp-client，如果想单纯一点，可以单独引入。-->
-       <!-- <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit</artifactId>
-            &lt;!&ndash;<version>${version}</version>&ndash;&gt;
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>org.springframework.amqp</groupId>
+             <artifactId>spring-rabbit</artifactId>
+             &lt;!&ndash;<version>${version}</version>&ndash;&gt;
+         </dependency>-->
     </dependencies>
 
 

@@ -63,6 +63,8 @@ public class TaskImpl implements ITask {
         ol.setNextTime((int) ((System.currentTimeMillis() / 1000) + Expiration));
         outlookService.update(ol);
 
+        executeE5(github_id,outlookId);
+
         /*将此用户信息加入redis，如果存在则代表在队列中，同时提前10秒过期*/
        /* String rsKey = "user.mq:" + github_id + ".outlookId:" + outlookId;
         if (!redisUtil.hasKey(rsKey)) {
@@ -125,7 +127,6 @@ public class TaskImpl implements ITask {
             }
             isExecuteE5 = true;
         } catch (Exception e) {
-            e.printStackTrace();
             /*连续错误判断*/
             if (!redisUtil.hasKey(errorKey)) {
                 redisUtil.set(errorKey, 1);

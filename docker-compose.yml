@@ -1,0 +1,60 @@
+# 写一个docker-compose.yml文件
+# 需要包含一个web服务，一个mysql的数据库服务
+version: '3'
+services:
+  e5-frontend:
+    image: musicminion/e5-frontend:latest
+    restart: always
+    ports:
+      - "4200:80"
+  e5-backend:
+    image: musicminion/e5-backend:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+      - influxdb
+    env_file:
+      - ./config.env
+  mysql:
+    image: mysql:8.0
+    restart: always
+    volumes:
+      - ./doc/sql/e5.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example_mysql_password
+      MYSQL_SSL_MODE: disabled
+    ports:
+      - "3306:3306"
+  redis:
+    image: redis:6.0.9
+    restart: always
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=example_redis_password
+    command: redis-server --appendonly yes
+  influxdb:
+    image: influxdb:2.0
+    restart: always
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=example_influxdb_password
+      - DOCKER_INFLUXDB_INIT_ORG=E5
+      - DOCKER_INFLUXDB_INIT_BUCKET=e5
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=example_influxdb_token
+    command: 
+      - influxd
+      - --reporting-disabled
+      - --http-bind-address=:8086
+      - --log-level=error

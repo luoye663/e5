@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
@@ -36,6 +37,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/outlook/outlook")
 @Slf4j
+@Validated
 public class OutlookController {
 
     @Autowired
@@ -51,9 +53,9 @@ public class OutlookController {
     }
 
     @PostMapping("/save")
-    public ResultVO save(@RequestBody UpdateBo bo) {
+    public ResultVO save(@Validated @RequestBody UpdateBo bo) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (outlookService.save(bo.getClient_id(), bo.getClient_secret(), bo.getOutlook_id(), authentication.getGithub_id())) {
+        if (outlookService.save(bo, authentication.getGithub_id())) {
             return new ResultVO<>();
         }
         return new ResultVO<>();
@@ -82,7 +84,7 @@ public class OutlookController {
             cron_time_random_start = Integer.valueOf(split[0]);
             cron_time_random_end = Integer.valueOf(split[1]);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return ResultUtil.error(ResultEnum.INVALID_format);
         }
         if (cron_time_random_start > cron_time_random_end) {
@@ -165,6 +167,12 @@ public class OutlookController {
         outlookService.setStart(authentication.getGithub_id(),id);
         return ResultUtil.success();
     }
+
+    /**
+     * 临时屏蔽 delete请求
+     * @param id
+     * @return
+     */
     @GetMapping("/delete")
     public Result delete(@RequestParam int id) {
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
