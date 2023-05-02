@@ -286,6 +286,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             Map<String, String> head = new HashMap<>();
             head.put("Content-Type", "application/json");
             head.put("Authorization", access_token);
+            
             /*不用管邮件内容*/
             OkHttpClientUtil.doGet("https://graph.microsoft.com/v1.0/me/messages/" + id, null, head, null);
         }
