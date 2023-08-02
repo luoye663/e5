@@ -223,6 +223,12 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
      */
     @Override
     public int getMailList(Outlook outlook) throws Exception {
+        /*先刷新一遍令牌*/
+        String token = refresh_token(outlook);
+        if (token == null) {
+            throw new Exception("刷新令牌[第一次]失败! refresh_token 为空!");
+        }
+
         String s = MailList(outlook.getAccessToken());
         JSONObject json = JSON.parseObject(s);
         /*错误情况，一般是令牌过期*/
