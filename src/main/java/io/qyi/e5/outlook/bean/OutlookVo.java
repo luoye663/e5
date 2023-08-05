@@ -18,5 +18,5 @@ public class OutlookVo {
     private Integer step;
     private Integer status;
     private Integer outlookId;
-
+    private String tenantId;
 }
