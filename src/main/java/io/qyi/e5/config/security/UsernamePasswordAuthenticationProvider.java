@@ -112,7 +112,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
 
 //       创建一个已认证的token
-        UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(github.getName(),
+        UsernamePasswordAuthenticationToken authenticationToken1 = new UsernamePasswordAuthenticationToken(github.getLogin(),
                 github.getAvatarUrl(), github.getGithubId(), token, "user", AuthorityUtils.createAuthorityList(Authority));
 
 //      设置一些详细信息
