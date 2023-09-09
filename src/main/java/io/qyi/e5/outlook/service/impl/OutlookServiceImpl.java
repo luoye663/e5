@@ -320,15 +320,19 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     @Override
     public int callPluginAPI(Outlook outlook) throws Exception {
         // 如果没有开启调用插件接口，那么就直接返回0
+        System.out.println(PluginAPICall + "@@@@@@");
         if (!PluginAPICall) {
             return 0;
         }
 
+        System.out.println("调用插件接口");
         // 进行插件API的调用
         Map<String, String> head = new HashMap<>();
         head.put("Content-Type", "application/json");
         head.put("Authorization", outlook.getAccessToken());
 
+        
+        System.out.println("here");
         // 所有的API列表
         List<String> APIList = List.of(
             "https://graph.microsoft.com/v1.0/me/drive/root/children",
