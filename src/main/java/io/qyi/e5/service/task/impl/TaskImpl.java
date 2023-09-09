@@ -118,12 +118,12 @@ public class TaskImpl implements ITask {
         int hour = currentTime.getHour(); 
         // 判断是否在可执行时间内
         if (weekDay == ((now_month + now_year) % 7) + 1 || weekDay == ((now_month + now_year) % 7) + 2) {
-            string log = "今天是" + now_year + "年" + now_month + "月 周" + weekDay + ",今天是休息日期，不进行开发工作。";
+            String log = "今天是" + now_year + "年" + now_month + "月 周" + weekDay + ",今天是休息日期，不进行开发工作。";
             outlookLogService.addLog(github_id, outlookId,"ok", 1, log);
             return false;
         }
         if (hour < 6 + weekDay || hour > 15 + weekDay) {
-            string log = "现在是" + hour + "点,不在可执行时间内，不进行开发工作。";
+            String log = "现在是" + hour + "点,不在可执行时间内，不进行开发工作。";
             outlookLogService.addLog(github_id, outlookId,"ok", 1, log);
             return false;
         }
