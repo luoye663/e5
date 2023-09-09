@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.time.LocalTime;
+import java.time.LocalDate;
 
 /**
  * @program: e5
@@ -102,6 +104,25 @@ public class TaskImpl implements ITask {
         }
     }
 
+    private boolean determineWhetherToExecute() {
+        LocalTime currentTime = LocalTime.now();
+        LocalDate currentDate = LocalDate.now();
+        // 获取当地的时间
+        // 获取当前的月份
+        int month = currentDate.getMonthValue();
+        // 获取当前的星期数
+        int weekDay = currentDate.getDayOfWeek().getValue();
+        int hour = currentTime.getHour(); // 获取当前的小时数
+        // 判断是否在可执行时间内
+        if (weekDay == (month % 7) + 1 || weekDay == (month % 7) + 2) {
+            return false;
+        }
+        if (hour < 6 + weekDay || hour > 15 + weekDay) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 调用一次邮件
      * @param github_id: github_id
@@ -117,6 +138,14 @@ public class TaskImpl implements ITask {
             log.warn("未找到此用户,github_id: {}", github_id);
             return false;
         }
+
+        /*判断是否在可执行时间内*/
+        if (!determineWhetherToExecute()) {
+            outlookLogService.addLog(github_id, outlookId,"ok", 1, "今天员工休息，不进行开发工作。");
+            // 还是返回true，认为本次工作流成功
+            return true;
+        }
+
         boolean isExecuteE5;
         String errorKey = "user.mq:" + github_id + ":outlook.id:" + outlookId + ":error";
         try {
