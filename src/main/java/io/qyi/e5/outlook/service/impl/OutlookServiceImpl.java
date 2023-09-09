@@ -334,20 +334,21 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         
         System.out.println("here");
         // 所有的API列表
-        List<String> APIList = List.of(
+        List<String> list = List.of(
             "https://graph.microsoft.com/v1.0/me/drive/root/children",
             "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name",
             "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=size",
-            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size"
-            // "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
-            // "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
-            // "https://graph.microsoft.com/v1.0/me/drive/recent",
-            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
-            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
-            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
-            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
-            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl"
+            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size",
+            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
+            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
+            "https://graph.microsoft.com/v1.0/me/drive/recent",
+            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
+            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
+            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
+            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
+            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl"
         );
+        List<String> APIList = new ArrayList<>(list);
         
         System.out.println("here1");
         // 随机打乱API列表
