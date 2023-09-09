@@ -338,20 +338,21 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
             "https://graph.microsoft.com/v1.0/me/drive/root/children",
             "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name",
             "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=size",
-            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size",
-            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
-            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
-            "https://graph.microsoft.com/v1.0/me/drive/recent",
-            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
-            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
-            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
-            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
-            "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl"
+            "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size"
+            // "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
+            // "https://graph.microsoft.com/v1.0/me/drive/root/children?$select=name,size&$top=" + (int) (Math.random() * 10 + 1),
+            // "https://graph.microsoft.com/v1.0/me/drive/recent",
+            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
+            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(1) + "')?select=name,id,webUrl",
+            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
+            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl",
+            // "https://graph.microsoft.com/v1.0/me/drive/root/search(q='" + randomStr(2) + "')?select=name,id,webUrl"
         );
         
+        System.out.println("here1");
         // 随机打乱API列表
         Collections.shuffle(APIList);
-        System.out.println(APIList);
+        System.out.println("here2");
 
         // 随机产生一个1-APIList.size()之间的数字
         int successNum = 0;

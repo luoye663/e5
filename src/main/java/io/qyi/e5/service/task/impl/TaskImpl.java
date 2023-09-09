@@ -180,6 +180,7 @@ public class TaskImpl implements ITask {
             }
             isExecuteE5 = true;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             /* 连续错误判断 */
             if (!redisUtil.hasKey(errorKey)) {
                 redisUtil.set(errorKey, 1);
