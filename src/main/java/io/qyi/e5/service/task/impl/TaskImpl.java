@@ -171,6 +171,7 @@ public class TaskImpl implements ITask {
         String errorKey = "user.mq:" + github_id + ":outlook.id:" + outlookId + ":error";
         try {
             int mail_count = outlookService.getMailList(Outlook);
+            System.out.println("mail_count = " + mail_count);
             // 插件API的调用次数
             int plugin_count = outlookService.callPluginAPI(Outlook);
             outlookLogService.addLog(github_id, outlookId, "ok", 1, "读取邮件:" + mail_count + ",其他API:" + plugin_count);

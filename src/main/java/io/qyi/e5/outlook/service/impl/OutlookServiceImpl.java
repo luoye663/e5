@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Array;
 import java.util.*;
 
+
 // import java.util.HashMap;
 // import java.util.List;
 // import java.util.Map;
@@ -346,6 +347,7 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         
         // 随机打乱API列表
         Collections.shuffle(APIList);
+        System.out.println(APIList);
 
         // 随机产生一个1-APIList.size()之间的数字
         int successNum = 0;
