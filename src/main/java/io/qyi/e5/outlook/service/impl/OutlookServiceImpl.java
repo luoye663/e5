@@ -320,19 +320,16 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
     @Override
     public int callPluginAPI(Outlook outlook) throws Exception {
         // 如果没有开启调用插件接口，那么就直接返回0
-        System.out.println(PluginAPICall + "@@@@@@");
         if (!PluginAPICall) {
             return 0;
         }
 
-        System.out.println("调用插件接口");
         // 进行插件API的调用
         Map<String, String> head = new HashMap<>();
         head.put("Content-Type", "application/json");
         head.put("Authorization", outlook.getAccessToken());
 
         
-        System.out.println("here");
         // 所有的API列表
         List<String> list = List.of(
             "https://graph.microsoft.com/v1.0/me/drive/root/children",
@@ -350,10 +347,8 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         );
         List<String> APIList = new ArrayList<>(list);
         
-        System.out.println("here1");
         // 随机打乱API列表
         Collections.shuffle(APIList);
-        System.out.println("here2");
 
         // 随机产生一个1-APIList.size()之间的数字
         int successNum = 0;
@@ -362,10 +357,20 @@ public class OutlookServiceImpl extends ServiceImpl<OutlookMapper, Outlook> impl
         for(int i = 0; i < callNum; i++){
             try {
                 String s = OkHttpClientUtil.doGet(APIList.get(i), null, head, null);
+
+                JSONObject json = JSON.parseObject(s);
+                /* 错误情况，一般是令牌过期 */
+                if (json.containsKey("error")) {
+                    String code = json.getJSONObject("error").getString("code");
+                    String message = json.getJSONObject("error").getString("message");
+
+                    throw new Exception("无法刷新令牌!code:" + code + " 错误消息: " + message);
+                }
+    
                 successNum++;
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                break;
+                throw new Exception("调用插件API失败!" + e.getMessage());
             }
         }
 
