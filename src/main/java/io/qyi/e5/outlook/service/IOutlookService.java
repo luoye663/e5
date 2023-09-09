@@ -26,6 +26,8 @@ public interface IOutlookService extends IService<Outlook> {
 
     int getMailList(Outlook outlook) throws Exception;
 
+    int callPluginAPI(Outlook outlook) throws Exception;
+
     List<Outlook> findAll();
 
     List<Outlook> findRunOutlookList();
