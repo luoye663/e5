@@ -9,22 +9,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+
 public class OkHttpClientUtil {
     private static int connTimeOut = 5 * 1000;
     private static int readTimeOut = 20 * 1000;
     private static int writeTimeOut = 10 * 1000;
     public static OkHttpClient client = null;
 
-    @Value("${e5.system.proxy_enable}")
-    private static boolean proxy_enable;
-
-    @Value("${e5.system.proxy_host}")
-    private static String proxy_host;
-
-    @Value("${e5.system.proxy_port}")
-    private static String proxy_port;
 
     static {
+        // 从环境变量中获取
+        boolean proxy_enable = Boolean.parseBoolean(System.getenv("E5_SYSTEM_PROXY_ENABLE"));
+        String proxy_host = System.getenv("E5_SYSTEM_PROXY_HOST");
+        String proxy_port = System.getenv("E5_SYSTEM_PROXY_PORT");
+
         X509TrustManager manager = SSLSocketClientUtil.getX509TrustManager();
 
         if (proxy_enable) {
