@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.Iterator;
 import java.util.List;
@@ -149,9 +151,10 @@ public class TaskImpl implements ITask {
     private String checkCurrentIP() {
         // https://ifconfig.me/all.json
         try{
-            String ipAPI = "https://ifconfig.me/ip";
-            // OkHttpClientUtil.doGet
-            return OkHttpClientUtil.doGet(ipAPI, null, null,null);
+            String ipAPI = "https://check.torproject.org/api/ip";
+            String ipJson = OkHttpClientUtil.doGet(ipAPI, null, null,null);
+            JSONObject json = JSON.parseObject(ipJson);
+            return json.getString("IP");
         }catch (Exception e){
             System.out.println(e.getMessage());
         };
