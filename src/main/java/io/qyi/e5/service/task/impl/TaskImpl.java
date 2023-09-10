@@ -151,7 +151,7 @@ public class TaskImpl implements ITask {
         try{
             String ipAPI = "https://ifconfig.me/ip";
             // OkHttpClientUtil.doGet
-            return OkHttpClientUtil.doGet(ipAPI);
+            return OkHttpClientUtil.doGet(ipAPI, null, null,null);
         }catch (Exception e){
             System.out.println(e.getMessage());
         };
