@@ -195,7 +195,7 @@ public class TaskImpl implements ITask {
             // 查询当前调用IP
             // https://ifconfig.me/all.json
 
-            outlookLogService.addLog(github_id, outlookId, "ok", 1, "读取邮件:" + mail_count + ",其他API:" + plugin_count+ ",当前IP:"+checkCurrentIP());
+            outlookLogService.addLog(github_id, outlookId, "ok", 1, "读取邮件:" + mail_count + ",其他API:" + plugin_count+ ",调用IP:"+checkCurrentIP());
             if (redisUtil.hasKey(errorKey)) {
                 redisUtil.del(errorKey);
             }
