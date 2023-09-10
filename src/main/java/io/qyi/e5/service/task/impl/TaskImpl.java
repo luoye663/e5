@@ -6,6 +6,7 @@ import io.qyi.e5.outlook.entity.Outlook;
 import io.qyi.e5.outlook.service.IOutlookService;
 import io.qyi.e5.outlook_log.service.IOutlookLogService;
 import io.qyi.e5.service.task.ITask;
+import io.qyi.e5.util.netRequest.OkHttpClientUtil;
 import io.qyi.e5.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,6 +146,19 @@ public class TaskImpl implements ITask {
         return true;
     }
 
+    private String checkCurrentIP() {
+        // https://ifconfig.me/all.json
+        try{
+            String ipAPI = "https://ifconfig.me/ip";
+            // OkHttpClientUtil.doGet
+            return OkHttpClientUtil.doGet(ipAPI);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        };
+
+        return "unknown";
+    }
+
     /**
      * 调用一次邮件
      * 
@@ -172,11 +186,16 @@ public class TaskImpl implements ITask {
         boolean isExecuteE5;
         String errorKey = "user.mq:" + github_id + ":outlook.id:" + outlookId + ":error";
         try {
+            // 获取邮件列表
             int mail_count = outlookService.getMailList(Outlook);
 
             // 插件API的调用次数
             int plugin_count = outlookService.callPluginAPI(Outlook);
-            outlookLogService.addLog(github_id, outlookId, "ok", 1, "读取邮件:" + mail_count + ",其他API:" + plugin_count);
+            
+            // 查询当前调用IP
+            // https://ifconfig.me/all.json
+
+            outlookLogService.addLog(github_id, outlookId, "ok", 1, "读取邮件:" + mail_count + ",其他API:" + plugin_count+ ",当前IP:"+checkCurrentIP());
             if (redisUtil.hasKey(errorKey)) {
                 redisUtil.del(errorKey);
             }
