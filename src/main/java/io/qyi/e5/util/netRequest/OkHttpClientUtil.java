@@ -3,6 +3,8 @@ package io.qyi.e5.util.netRequest;
 import okhttp3.*;
 
 import javax.net.ssl.X509TrustManager;
+import java.net.Proxy;
+import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -13,20 +15,44 @@ public class OkHttpClientUtil {
     private static int writeTimeOut = 10 * 1000;
     public static OkHttpClient client = null;
 
+    @Value("${e5.system.proxy_enable}")
+    private static boolean proxy_enable;
+
+    @Value("${e5.system.proxy_host}")
+    private static String proxy_host;
+
+    @Value("${e5.system.proxy_port}")
+    private static String proxy_port;
+
     static {
         X509TrustManager manager = SSLSocketClientUtil.getX509TrustManager();
-        client = new OkHttpClient.Builder()
-                .connectTimeout(connTimeOut, TimeUnit.SECONDS)
-                .readTimeout(readTimeOut, TimeUnit.SECONDS)
-                .writeTimeout(writeTimeOut, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(true)
-                .sslSocketFactory(SSLSocketClientUtil.getSocketFactory(manager), manager)// 忽略校验
-                .hostnameVerifier(SSLSocketClientUtil.getHostnameVerifier())//忽略校验
-                .build();
+
+        if (proxy_enable) {
+            Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxy_host, Integer.parseInt(proxy_port)));
+
+            client = new OkHttpClient.Builder()
+                    .connectTimeout(connTimeOut, TimeUnit.SECONDS)
+                    .readTimeout(readTimeOut, TimeUnit.SECONDS)
+                    .writeTimeout(writeTimeOut, TimeUnit.SECONDS)
+                    .proxy(proxy) // 设置代理
+                    .retryOnConnectionFailure(true)
+                    .sslSocketFactory(SSLSocketClientUtil.getSocketFactory(manager), manager)
+                    .hostnameVerifier(SSLSocketClientUtil.getHostnameVerifier())
+                    .build();
+        } else {
+            client = new OkHttpClient.Builder()
+                    .connectTimeout(connTimeOut, TimeUnit.SECONDS)
+                    .readTimeout(readTimeOut, TimeUnit.SECONDS)
+                    .writeTimeout(writeTimeOut, TimeUnit.SECONDS)
+                    .retryOnConnectionFailure(true)
+                    .sslSocketFactory(SSLSocketClientUtil.getSocketFactory(manager), manager)// 忽略校验
+                    .hostnameVerifier(SSLSocketClientUtil.getHostnameVerifier())// 忽略校验
+                    .build();
+        }
     }
 
-
-    public static String doGet(String host, String path, Map<String, String> headers, Map<String, String> querys) throws Exception {
+    public static String doGet(String host, String path, Map<String, String> headers, Map<String, String> querys)
+            throws Exception {
         StringBuffer url = new StringBuffer(host + (path == null ? "" : path));
         if (querys != null) {
             url.append("?");
@@ -96,7 +122,8 @@ public class OkHttpClientUtil {
         return responseStr;
     }
 
-    public static String doPut(String host, String path, Map<String, String> headers, Map<String, String> querys) throws Exception {
+    public static String doPut(String host, String path, Map<String, String> headers, Map<String, String> querys)
+            throws Exception {
         FormBody.Builder builder = new FormBody.Builder();
         Iterator iterator = querys.entrySet().iterator();
 
